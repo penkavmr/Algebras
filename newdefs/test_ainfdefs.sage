@@ -12,7 +12,28 @@ from ainfdefs import *
 
 print "Testing ainfdefs.sage..."
 
-# this function tests all other functions
+# All functions to be tested go here as list entries with the format:
+#   [function_name, (args), return_value]
+functions = [
+    # basics
+    [deltaij, (1,1), 1],
+    [deltaij, (1,-2), 0],
+    [parity_elem, 22, 1],
+    [parity_elem, -5, 0],
+    [Sgn, 4, 1],
+    [Sgn, 5, -1],
+    # coefficients
+    [add_coef, (2,5), 7],
+    [add_coef, (0,-3), -3],
+    [mk_num_coef, 3, mult_coef_num(ONECOEF,3)],
+    [mult_coef, (1,4), 4],
+    [mult_coef, (2,-3), -6],
+
+    [parity_tbas, ONE, 0],
+    [parity_tbas, [1,2,3], 1],
+    [parity_tbas, [1,2], 0]
+]
+
 def testFunc(func, x, y):
     if isinstance(x, tuple):
         assert (func(*x) == y), func.__name__ + "(" + \
@@ -21,18 +42,9 @@ def testFunc(func, x, y):
         assert (func(x) == y), func.__name__ + "(" + \
             str(x) + ") != " + str(y)
 
-##============================  Basic tests  =============================##
-def caseDeltaij():
-    testFunc(deltaij, (1,1), 1)
-    testFunc(deltaij, (1,-2), 0)
-
-def caseParityElem():
-    testFunc(parity_elem, 22, 1)
-    testFunc(parity_elem, -5, 0)
-
-def caseSgn():
-    testFunc(Sgn, 4, 1)
-    testFunc(Sgn, 5, -1)
+def testFunctions():
+    for func in functions:
+        testFunc(*func)
 
 ##==========================  Coefficient tests  =========================##
 def caseAddCoef():
@@ -62,25 +74,15 @@ def caseParityTbas():
     testFunc(parity_tbas, ONE, 0)
     testFunc(parity_tbas, [1,2,3], 1)
     testFunc(parity_tbas, [1,2], 0)
-    assert (parity_tbas(ONE) == 0), \
-        "parity_tbas(ONE) should be 0"
-    assert (parity_tbas([1,2,3]) == 1), \
-        "parity_tbas([1,2,3]) should be 1"
-    assert (parity_tbas([1,2]) == 0), \
-        "parity_tbas([1,2]) should be 0"
 
 ##=======================  Tensor Monomial tests  ========================##
 def caseDegreeTmon():
-    assert(degree_tmon([[1,2],2]) == 2), \
-        "degree_tmon([[1,2],2]) should be 2"
-    assert(degree_tmon([[1,2,3,4],5]) == 4), \
-        "degree_tmon([[1,2,3,4],5]) should be 4"
+    testFunc(degree_tmon, [[1,2],2], 2)
+    testFunc(degree_tmon, [[1,2,3,4],5], 4)
 
 def caseLmultTmonCoef():
-    assert(lmult_tmon_coef(2,[[1,2,3],1]) == [[1,2,3],2]), \
-        "lmult_tmon_coef(2,[[1,2,3],1]) should be [[1,2,3],2]"
-    assert(lmult_tmon_coef(3,[[1,2],4]) == [[1,2],12]), \
-        "lmult_tmon_coef(3,[[1,2],4]) should be [[1,2],12]"
+    testFunc(lmult_tmon_coef, (2,[[1,2,3],1]), [[1,2,3],2])
+    testFunc(lmult_tmon_coef, (3,[[1,2],4]), [[1,2],12])
 
 def caseMkTmon():
     assert(mk_tmon([1,2,3]) == [[1, 2, 3], 1]), \
@@ -232,6 +234,9 @@ def suiteCoderivationTests():
 # Run the test suites in the try body below
 
 try:
+    testFunctions()
+
+
     # Test suites go here!
     suiteInitialTests()
     suiteCoefficientTests()
