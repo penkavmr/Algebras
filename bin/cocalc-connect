@@ -1,0 +1,70 @@
+#!/bin/bash
+
+##=============================  cocalc-connect  =============================##
+# This script automates connecting and disconnecting to the CoCalc server.
+#
+# REQUIREMENTS:
+#     sshfs
+#         Remote CoCalc filesystem is mounted as a local directory via sshfs.
+#     ssh
+#         CoCalc server is logged into via ssh.
+#
+# SETUP:
+#     Before usage, users need to add their public keys to the file
+#     `~/.ssh/authorized_keys` on the CoCalc server.
+#
+#     Users can choose their own local directory LOCAL_DIR as a mountpoint
+#     for the CoCalc filesystem.
+#
+#     Also, each CoCalc user may have a different COCALC_USERNAME to set.
+
+##=============================  VARIABLES  ==============================##
+COCALC_USERNAME='49cd4127c030444b8679bf634bf35a69'
+COCALC_HOST='compute3-us.sagemath.com'
+COCALC_DIR='/projects/49cd4127-c030-444b-8679-bf634bf35a69'
+LOCAL_DIR="$HOME/arc/uwec/cocalc/"
+
+##==============================  prompt()  ==============================##
+# Basic Y/N prompt.  Returns 0 if user inputs [yes], returns 1 if [no].
+# Default choice (yes) can be changed with --no flag.
+prompt() {
+    local str_input=
+    local str_yn="[Y/n]> "
+    for arg in "$@"; do
+        case ${arg} in
+            --yes|-y|-Y)  shift;;
+            --no|-n|-N)   str_yn="[y/N]> "; shift;;
+        esac
+    done
+    printf "$1 ${str_yn}"
+    read -r str_input
+    str_input="${str_input,,}"
+    if [[ ${str_input} =~ ^(yes|y)$ ]] ||
+       ([[ ! ${str_input} =~ ^(no|n)$ ]] && [[ "${str_yn}" == "[Y/n]> " ]]);then
+        return 0
+    else
+        return 1
+    fi
+}
+
+##================================  main  ================================##
+if (mountpoint -q "$LOCAL_DIR"); then
+    if prompt --no "Unmount CoCalc filesystem at $LOCAL_DIR?"; then
+        printf "> fusermount -u $LOCAL_DIR\n"
+        fusermount -u "$LOCAL_DIR"
+    fi
+else
+    if prompt "Mount CoCalc filesystem?"; then
+        mkdir -p "$LOCAL_DIR"
+        printf "> sshfs $COCALC_USERNAME@$COCALC_HOST:$COCALC_DIR $LOCAL_DIR\n"
+        sshfs "$COCALC_USERNAME@$COCALC_HOST:$COCALC_DIR" "$LOCAL_DIR"
+    fi
+fi
+
+if prompt --no "ssh into CoCalc server?"; then
+    printf "ssh $COCALC_USERNAME@$COCALC_HOST\n"
+    ssh "$COCALC_USERNAME@$COCALC_HOST"
+fi
+
+
+
