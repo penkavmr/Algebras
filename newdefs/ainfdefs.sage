@@ -55,6 +55,7 @@ def get_DIMENSION():
 def set_DIMENSION(dimension):
     global DIMENSION
     DIMENSION = dimension
+    return DIMENSION
 
 def get_EVEN():
     return EVEN
@@ -62,6 +63,7 @@ def get_EVEN():
 def set_EVEN(even):
     global EVEN
     EVEN = even
+    return EVEN
 
 def get_ODD():
     return ODD
@@ -69,6 +71,7 @@ def get_ODD():
 def set_ODD(odd):
     global ODD
     ODD = odd
+    return ODD
 
 def get_PARITY():
     return PARITY
@@ -76,6 +79,7 @@ def get_PARITY():
 def set_PARITY(parity):
     global PARITY
     PARITY = parity
+    return PARITY
 
 
 ##==========================  basic Functions  ===========================##
