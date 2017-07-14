@@ -309,3 +309,7 @@ def parity_cmon(cmon):
 def apply_cmon_tens(cmon, tens):
     return apply_cbase_tens(cmon[CMON_BASE],
         lmult_tens_coef(cmon[CMON_COEF], tens))
+
+##=================  Coderivation Coefficient Functions  =================##
+#def lmult_cmon_coef(coef, cmon):
+    #return mk_cmon(cmon[CMON_BASE], mult_coef(cmon[CMON_COEF], ))
