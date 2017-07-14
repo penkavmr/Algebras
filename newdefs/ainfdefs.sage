@@ -1,5 +1,7 @@
+#!/usr/bin/env sage
+
 ##=============================  ainfdefs.sage  ==============================##
-'''
+"""
 Work in progress; this script is a rewriting of the 'ainfdefs.mws' Maple14
 code in the sage/python programming language.
 
@@ -20,8 +22,13 @@ OBJECTS:
 A Base is represented by a list.
 A Tensor Monomial is represented by a list containing a base and a coefficient.
 A Tensor is represented by a list of tensor monomials.
+A Coderivation Base is represented by a list containing a list and an index.
+A Coderivation Monomial is represented by a list containing a coderivation base
+    and a coefficient.
+
+??
 A Coderivation is represented by a list containing a list and an index(number).
-'''
+"""
 
 ##==========================  GLOBAL VARIABLES  ==========================##
 # Subject to change for each space tested over (ie. ZEROCOEF is not always 0)
@@ -45,9 +52,12 @@ ONETENS = [ONETMON]
 CBASE_LIST = 0   # index of list in a coderivation
 CBASE_INDEX = 1  # index of index in a coderivation
 
+CMON_BASE = 0  # index of the base in a coderivation monomial
+CMON_COEF = 1  # index of the coefficient in a coderivation monomial
+
 ##======================  getters and setters  =======================##
 # These functions are NOT part of the original Maple code.
-# To modify the value of global variables in this module,these functions
+# To modify the value of global variables in this module, these functions
 # must be used.
 def get_DIMENSION():
     return DIMENSION
@@ -245,7 +255,7 @@ def pnt_coef(a):
 # been left out of the Sage code.
 
 
-##=======================  Coderivation Functions  =======================##
+##====================  Coderivation Basis Functions  ====================##
 def mk_cbase(lst, index):
     cbase_result = [None] * 2
     cbase_result[CBASE_LIST] = lst
@@ -281,6 +291,21 @@ def apply_cbase_tmon(cbas, tmon):
     return rmult_tens_coef(apply_cbase_tbas(cbas, tmon[TMON_BASE]),
         tmon[TMON_COEF])
 
-#
+# apply a coderivation base to a tensor
+def apply_cbase_tens(cbas, tens):
+    res = ZEROTENS
+    for tmon in tens:
+        res = add_tens(res, apply_cbase_tmon(cbas, tmon))
+    return comb_tens(res)
 
 
+##==================  Coderivation Monomial Functions  ===================##
+def mk_cmon(cbas, coef=ONECOEF):
+    return [cbas, coef]
+
+def parity_cmon(cmon):
+    return (parity_cbase(cmon[CMON_BASE]) + parity_coef(cmon[CMON_COEF])) % 2
+
+def apply_cmon_tens(cmon, tens):
+    return apply_cbase_tens(cmon[CMON_BASE],
+        lmult_tens_coef(cmon[CMON_COEF], tens))

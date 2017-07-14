@@ -6,10 +6,11 @@ import os
 # return values from the original Maple code.
 
 # set up testing environment by parsing ainfdefs into regular python
-os.system('sage --preparse ainfdefs.sage')
-os.system('mv ainfdefs.sage.py ainfdefs.py')
-from ainfdefs import *
+#os.system('sage --preparse ainfdefs.sage')
+#os.system('mv ainfdefs.sage.py ainfdefs.py')
+#from ainfdefs import *
 
+load('ainfdefs.sage')
 print "Testing ainfdefs.sage..."
 
 ##=============================  functions  ==============================##
@@ -69,7 +70,7 @@ functions = [
     [mult_tens_num, (3,[[[1,2],7],[[1,3],3]]), [[[1,2],21],[[1,3],9]]],
     [rmult_tens_coef, ([[[1,3],2]],7), [[[1,3],14]]],
     [rmult_tens_coef, ([[[1,2],3],[[1,3],4]],2), [[[1,2],6],[[1,3],8]]],
-    # coderivations
+    # coderivation basis
     [mk_cbase, ([1,2,3],4), [[1,2,3],4]],
     [parity_cbase, ([[1,2,3],4]), 0],
     [set_PARITY, 2, 2],
@@ -78,7 +79,20 @@ functions = [
     [apply_cbase_tbas, ([[1,2,3],4],[1,2,3]), [[[4],1]]],
     [apply_cbase_tbas, ([[1,2,3],7],[4,5,6]), ZEROTENS],
     [apply_cbase_tmon, ([[1,2,3],4],[[1,2,3],5]), [[[4],5]]],
-    [apply_cbase_tmon, ([[1,2],3],[[1,3],4]), ZEROTENS]
+    [apply_cbase_tmon, ([[1,2],3],[[1,3],4]), ZEROTENS],
+    [apply_cbase_tens, ([[1,2],3],[[[1,2],4],[[1,3],4],[[1,2],7]]), [[[3],11]]],
+    [apply_cbase_tens, ([[1,2],3],[[[4,5],7]]), ZEROTENS],
+    # coderivation monomials
+    [mk_cmon, ([[1,2],3]), [[[1,2],3],1]],
+    [mk_cmon, ([[3,4],5],6), [[[3,4],5],6]],
+    [mk_cmon, ([],7), [[],7]],
+    [parity_cmon, ([[[1,3],3],1]), 1],
+    [set_PARITY, 2, 2],
+    [parity_cmon, ([[[1,3],3],1]), 0],
+    [set_PARITY, 0, 0],
+    [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],3],[[4,5],6]]), [[[3],15]]],
+    [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],4],[[6,7],8]]), [[[3],20]]],
+    [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],4],[[1,2],9]]), [[[3],65]]]
 ]
 
 ##===============================  tests  ================================##
@@ -95,7 +109,7 @@ def testFunctions():
         testFunc(*func)
 
 try:
-    #testFunctions()
+    testFunctions()
     # Tests all pass :)
     print "High five! All tests pass!"
 except AssertionError as err:
@@ -104,5 +118,4 @@ except AssertionError as err:
 
 # tear down testing environment
 os.system('rm -f ainfdefs.py ainfdefs.pyc test_ainfdefs.sage.py')
-
 
