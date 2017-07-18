@@ -55,6 +55,8 @@ CBASE_INDEX = 1  # index of index in a coderivation
 CMON_BASE = 0  # index of the base in a coderivation monomial
 CMON_COEF = 1  # index of the coefficient in a coderivation monomial
 
+ZEROCODER = []
+
 ##======================  getters and setters  =======================##
 # These functions are NOT part of the original Maple code.
 # To modify the value of global variables in this module, these functions
@@ -101,8 +103,7 @@ def deltaij(i,j):
 def parity_elem(i):
     if i<=PARITY:
         return 0
-    else:
-        return 1
+    return 1
 
 # (-1)^i
 def Sgn(i):
@@ -141,11 +142,10 @@ def mult_tbas(base1,base2):
 def parity_tbas(base):
     if base == ONE:
         return 0
-    else:
-        s = 0
-        for t in base:
-            s += parity_elem(t)
-        return mod(s,2)
+    s = 0
+    for t in base:
+        s += parity_elem(t)
+    return mod(s,2)
 
 
 ##=====================  Tensor Monomial Functions  ======================##
@@ -165,8 +165,7 @@ def lmult_tmon_coef(coef,tmon):
 def mk_tmon(base, coef=ONECOEF):
     if coef == ZEROCOEF:
         return ZEROTMON
-    else:
-        return [base,coef]
+    return [base,coef]
 
 # parity of a tensor monomial
 def parity_tmon(tmon):
@@ -311,5 +310,38 @@ def apply_cmon_tens(cmon, tens):
         lmult_tens_coef(cmon[CMON_COEF], tens))
 
 ##=================  Coderivation Coefficient Functions  =================##
-#def lmult_cmon_coef(coef, cmon):
-    #return mk_cmon(cmon[CMON_BASE], mult_coef(cmon[CMON_COEF], ))
+def lmult_cmon_coef(coef, cmon):
+    return mk_cmon(cmon[CMON_BASE], mult_coef(coef, cmon[CMON_COEF]))
+    # the original Maple code for this appears to be flawed
+
+def rmult_cmon_coef(cmon, coef):
+    return lmult_cmon_coef(coef, cmon)
+
+def mult_cmon_num(num, cmon):
+    return lmult_cmon_coef(mult_coef_num(ONECOEF, num), cmon)
+
+
+
+
+##=======================  Coderivation Functions  =======================##
+def mk_coder(cmon):
+    return [cmon]
+
+def add_coder(coder1, coder2):
+    return coder1 + coder2
+
+def parity_coder(coder):
+    if coder == ZEROCODER:
+        return 0
+    parity = parity_cmon(coder[0])
+    for cmon in coder:
+        if parity_cmon(cmon) != parity:
+            print 'ERROR: parity of coderivation in not well defined'
+            return -1  # returns -1 on error
+    return parity
+
+
+
+
+
+

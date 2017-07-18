@@ -15,7 +15,7 @@ print "Testing ainfdefs.sage..."
 
 ##=============================  functions  ==============================##
 # All functions to be tested go here as list entries with the format:
-#   [function_name, (args), return_value]
+#   [function_name, (arg1, arg2, ... ), return_value]
 functions = [
     # basics
     [deltaij, (1,1), 1],
@@ -92,10 +92,24 @@ functions = [
     [set_PARITY, 0, 0],
     [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],3],[[4,5],6]]), [[[3],15]]],
     [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],4],[[6,7],8]]), [[[3],20]]],
-    [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],4],[[1,2],9]]), [[[3],65]]]
+    [apply_cmon_tens, ([[[1,2],3],5],[[[1,2],4],[[1,2],9]]), [[[3],65]]],
+    [lmult_cmon_coef, (3,[[[1,2],3],4]), [[[1,2],3],12]],
+    [rmult_cmon_coef, ([[[1,2],3],4],7), [[[1,2],3],28]],
+    [mult_cmon_num, (7,[[[1,2],3],5]), [[[1,2],3],35]],
+
+
+
+    [mk_coder, ([[[1,2,],3],4]), [[[[1,2],3],4]]],
+    [add_coder, ([[[[1,2],3],4]],[[[[5,6],7],8]]),
+        [[[[1,2],3],4],[[[5,6],7],8]]],
+    [parity_coder, ([[[[1,2],3],4],[[[5,6],7],8]]), 1],
+    [set_PARITY, 4, 4],
+    [parity_coder, ([[[[1,2],3],4],[[[5,6],7],8]]), -1],
+    [set_PARITY, 0, 0]
 ]
 
 ##===============================  tests  ================================##
+# This code tests all the functions in the test list.
 def testFunc(func, x, y):
     if isinstance(x, tuple):
         assert (func(*x) == y), func.__name__ + "(" + \
