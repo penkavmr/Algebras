@@ -25,9 +25,7 @@ A Tensor is represented by a list of tensor monomials.
 A Coderivation Base is represented by a list containing a list and an index.
 A Coderivation Monomial is represented by a list containing a coderivation base
     and a coefficient.
-
-??
-A Coderivation is represented by a list containing a list and an index(number).
+A Coderivation is represented by a list of coderivation monomials.
 """
 
 ##==========================  GLOBAL VARIABLES  ==========================##
@@ -156,10 +154,10 @@ def parity_tbas(base):
 def degree_tmon(tmon):
     return len(tmon[TMON_BASE])
 
-# The original Maple code for this is incorrect:
 # multiply a tensor monimial by a coefficient on the left
 def lmult_tmon_coef(coef,tmon):
     return mk_tmon(tmon[TMON_BASE], mult_coef(coef, tmon[TMON_COEF]))
+    # the original Maple code for this is incorrect
 
 # construct a tensor monimial; base = [ [base], coefficient ]
 def mk_tmon(base, coef=ONECOEF):
@@ -309,6 +307,7 @@ def apply_cmon_tens(cmon, tens):
     return apply_cbase_tens(cmon[CMON_BASE],
         lmult_tens_coef(cmon[CMON_COEF], tens))
 
+
 ##=================  Coderivation Coefficient Functions  =================##
 def lmult_cmon_coef(coef, cmon):
     return mk_cmon(cmon[CMON_BASE], mult_coef(coef, cmon[CMON_COEF]))
@@ -319,8 +318,6 @@ def rmult_cmon_coef(cmon, coef):
 
 def mult_cmon_num(num, cmon):
     return lmult_cmon_coef(mult_coef_num(ONECOEF, num), cmon)
-
-
 
 
 ##=======================  Coderivation Functions  =======================##
@@ -358,7 +355,12 @@ def comb_coder(coder):
                     mk_coder(mk_cmon(cmon[CMON_BASE], coef)))
     return coder_result
 
-
+# add any number of coderivations together
+def ad(*args):
+    coder = ZEROCODER
+    for arg in args:
+        coder = coder + arg
+    return comb_coder(coder)
 
 
 

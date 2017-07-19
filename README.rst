@@ -18,8 +18,8 @@ phases:
    good amount of code to be rewritten from scratch.
 
 
-Coding
-======
+Code
+====
 
 New SageMath code is located in the ``newdefs/`` folder.
 
