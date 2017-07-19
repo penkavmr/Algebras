@@ -340,6 +340,23 @@ def parity_coder(coder):
             return -1  # returns -1 on error
     return parity
 
+# simplify a coderivation by combining like terms
+def comb_coder(coder):
+    if coder == ZEROCODER:
+        return ZEROCODER
+    cbas_counted = []
+    coder_result = ZEROCODER
+    for cmon in coder:
+        if cmon[CMON_BASE] not in cbas_counted:
+            cbas_counted += [cmon[CMON_BASE]]
+            coef = ZEROCOEF
+            for cmon2 in coder:
+                if cmon2[CMON_BASE] == cmon[CMON_BASE]:
+                    coef = add_coef(cmon2[CMON_COEF], coef)
+            if coef != ZEROCOEF:
+                coder_result = add_coder(coder_result,
+                    mk_coder(mk_cmon(cmon[CMON_BASE], coef)))
+    return coder_result
 
 
 
