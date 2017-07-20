@@ -10,6 +10,7 @@ import os
 #os.system('mv ainfdefs.sage.py ainfdefs.py')
 #from ainfdefs import *
 
+
 load('ainfdefs.sage')
 print "Testing ainfdefs.sage..."
 
@@ -17,6 +18,11 @@ print "Testing ainfdefs.sage..."
 # All functions to be tested go here as list entries with the format:
 #   [function_name, (arg1, arg2, ... ), return_value]
 functions = [
+    # setters
+    [set_PARITY, (0), 0],
+    [set_DIMENSION, (1), 1],
+    [set_EVEN, (0), 0],
+    [set_ODD, (1), 1],
     # basics
     [deltaij, (1,1), 1],
     [deltaij, (1,-2), 0],
@@ -96,10 +102,8 @@ functions = [
     [lmult_cmon_coef, (3,[[[1,2],3],4]), [[[1,2],3],12]],
     [rmult_cmon_coef, ([[[1,2],3],4],7), [[[1,2],3],28]],
     [mult_cmon_num, (7,[[[1,2],3],5]), [[[1,2],3],35]],
-
-
-
     [mk_coder, ([[[1,2,],3],4]), [[[[1,2],3],4]]],
+
     [add_coder, ([[[[1,2],3],4]],[[[[5,6],7],8]]),
         [[[[1,2],3],4],[[[5,6],7],8]]],
     [parity_coder, ([[[[1,2],3],4],[[[5,6],7],8]]), 1],
@@ -111,7 +115,11 @@ functions = [
         [[[[1,2],3],11],[[[5,6],7],8]]],
     [ad, ([[[[1,2],3],4]],[[[[6,7],8],9]],[[[[1,2],3],4]]),
         [[[[1,2],3],8],[[[6,7],8],9]]],
-    [ad, ([],[[[[1,2],3],4]],[]), [[[[1,2],3],4]]]
+    [ad, ([],[[[[1,2],3],4]],[]), [[[[1,2],3],4]]],
+    [apply_coder_tens, ([[[[1,2],3],11]],[[[1,2],3]]), [[[3],33]]],
+    [apply_coder_tens, ([[[[1,2],3],11]],[[[1,2],4],[[4,5],6]]), [[[3],44]]],
+    [apply_coder_tens, ([[[[1,2],3],4],[[[6,7],8],9]],[[[1,2],3],
+        [[6,7],8],[[1,3],4]]), [[[3],12],[[8],72]]]
 ]
 
 ##===============================  tests  ================================##

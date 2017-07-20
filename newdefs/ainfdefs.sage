@@ -337,6 +337,8 @@ def parity_coder(coder):
             return -1  # returns -1 on error
     return parity
 
+#def lmult_coder_coef
+
 # simplify a coderivation by combining like terms
 def comb_coder(coder):
     if coder == ZEROCODER:
@@ -362,5 +364,10 @@ def ad(*args):
         coder = coder + arg
     return comb_coder(coder)
 
-
+# apply a coderivation to a tensor
+def apply_coder_tens(coder, tens):
+    tens_result = ZEROTENS
+    for cmon in coder:
+        tens_result = tens_result + apply_cmon_tens(cmon, tens)
+    return comb_tens(tens_result)
 
