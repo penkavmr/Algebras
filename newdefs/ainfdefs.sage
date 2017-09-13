@@ -307,8 +307,6 @@ def apply_cmon_tens(cmon, tens):
     return apply_cbase_tens(cmon[CMON_BASE],
         lmult_tens_coef(cmon[CMON_COEF], tens))
 
-
-##=================  Coderivation Coefficient Functions  =================##
 def lmult_cmon_coef(coef, cmon):
     return mk_cmon(cmon[CMON_BASE], mult_coef(coef, cmon[CMON_COEF]))
     # the original Maple code for this appears to be flawed
@@ -337,7 +335,18 @@ def parity_coder(coder):
             return -1  # returns -1 on error
     return parity
 
-#def lmult_coder_coef
+# multiply a coderivation
+def lmult_coder_coef(a, coder):
+    coder_result = ZEROCODER
+    for cmon in coder:
+        coder_result = coder_result + [lmult_cmon_coef(a,cmon)]
+    return comb_coder(coder_result)
+
+def rmult_coder_coef(coder, a):
+    return lmult_coder_coef(a, coder)
+
+def mult_coder_num(a, coder):
+    return lmult_coder_coef(mult_coef_num(ONECOEF, a), coder)
 
 # simplify a coderivation by combining like terms
 def comb_coder(coder):
@@ -371,3 +380,6 @@ def apply_coder_tens(coder, tens):
         tens_result = tens_result + apply_cmon_tens(cmon, tens)
     return comb_tens(tens_result)
 
+##=======================  Coderivation Brackets  ========================##
+# compute composition of two coderivation bases
+def comp_cbase(cbas1, cbas2):
