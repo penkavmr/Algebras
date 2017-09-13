@@ -225,204 +225,205 @@ a,coder)\n  local i, res, mon;\n  res:=ZEROCODER;\n  for i to nops(cod
 er) do\n    mon:=lmult_cmon_coef(a,coder[i]);\n    res:=[op(res),mon];
 \n  od;\n  comb_coder(res);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 63 "
 Right multiplication of a general coderivation by a coefficient" }}
-{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 170 "rmult_coder_coef:=proc(
-coder,a)\nlocal i, res, mon;\nres:=ZEROCODER;\nfor i to nops(coder) do
-\nmon:=rmult_cmon_coef(coder[i],a);\nres:=[op(res),mon];\nod;\ncomb_co
-der(res);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 52 "Multiplication of \+
-a general coderivation by a number" }}{EXCHG {PARA 257 "> " 0 "" 
-{MPLTEXT 1 257 112 "mult_coder_num:=proc(n,coder)\nlocal res,coef;\nco
-ef:=mult_coef_num(ONECOEF,n);\nlmult_coder_coef(coef,coder);\nend:" }}
-}{PARA 256 "" 0 "" {TEXT 256 22 "Printing a coefficient" }}{EXCHG 
-{PARA 257 "> " 0 "" {MPLTEXT 1 257 23 "pnt_coef:=proc(c)c;end:" }}}
+{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 188 "rmult_coder_coef:=proc(
+coder,a)\n  local i, res, mon;\n  res:=ZEROCODER;\n  for i to nops(cod
+er) do\n    mon:=rmult_cmon_coef(coder[i],a);\n    res:=[op(res),mon];
+\n  od;\n  comb_coder(res);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 52 "
+Multiplication of a general coderivation by a number" }}{EXCHG {PARA 
+257 "> " 0 "" {MPLTEXT 1 257 118 "mult_coder_num:=proc(n,coder)\n  loc
+al res,coef;\n  coef:=mult_coef_num(ONECOEF,n);\n  lmult_coder_coef(co
+ef,coder);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 22 "Printing a coeffi
+cient" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 27 "pnt_coef:=proc(
+c)\n  c;\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 
+270 "" 0 "" {TEXT 270 18 "Coderivation Bases" }}{PARA 256 "" 0 "" 
+{TEXT 256 74 "We designate the positions of the list and index in the \+
+coderivation base." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 30 "CB
+ASE_LIST:=1:\nCBASE_INDEX:=2:" }}}{PARA 256 "" 0 "" {TEXT 256 59 "The \+
+command below makes a cbase out of a list and an index." }}{EXCHG 
+{PARA 257 "> " 0 "" {MPLTEXT 1 257 125 "mk_cbase:=proc(List,index)\n  \+
+local out, res;\n  res[CBASE_LIST]:=List;\n  res[CBASE_INDEX]:=index;
+\n  out:=[res[1],res[2]];\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 57 "Th
+e program below find the parity of a coderivation base." }}{EXCHG 
+{PARA 257 "> " 0 "" {MPLTEXT 1 257 142 "parity_cbase:=proc(cbas::[list
+,posint])  \n  local i,par;\n  par:=(parity_elem(cbas[CBASE_INDEX])+\n
+   parity_tbas(cbas[CBASE_LIST])) mod 2;\nend:" }}}{PARA 256 "" 0 "" 
+{TEXT 256 63 "The program below applies a coderivation base to a tenso
+r base." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 501 "apply_cbase_
+tbas:=proc(cbas::[list,posint],tbas::list)\n  local res,j,J,k,coef,der
+term,otbas,derlist;\n  res:=ZEROTENS;\n  J:=cbas[CBASE_LIST];\n  j:=cb
+as[CBASE_INDEX];\n  if tbas=ONE then \n    return(ZEROTENS)\n  fi;\n  \+
+for k from 0 to nops(tbas)-nops(J) do\n    coef:=deltaij(J,tbas[k+1..k
++nops(J)])*\n     sgn(parity_tbas(tbas[1..k])*parity_cbase(cbas));\n  \+
+  otbas:=[op(tbas[1..k]),j,\n     op(tbas[k+nops(J)+1..nops(tbas)])];
+\n    res:=add_tens(res,mk_tens(mk_tmon(otbas,coef)));\n  od;\n  comb_
+tens(res);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 67 "The program below
+ applies a coderivation base to a tensor monomial." }}{EXCHG {PARA 
+257 "> " 0 "" {MPLTEXT 1 257 181 "apply_cbase_tmon:=proc(cbas,tmon)\n \+
+ local res,coef,tbas;\n  tbas:=tmon[TMON_BASE];\n  coef:=tmon[TMON_COE
+F];\n  res:=apply_cbase_tbas(cbas,tbas);\n  res:=rmult_tens_coef(res,c
+oef);\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 58 "This next program appl
+ies a coderivation base to a tensor." }}{EXCHG {PARA 259 "> " 0 "" 
+{MPLTEXT 1 259 176 "apply_cbase_tens:=proc(cbas,tens)\n  local res,tmo
+n;\n  res:=ZEROTENS;\n  for tmon in tens do\n    res:=add_tens(res,app
+ly_cbase_tmon(cbas,tmon));\n  od;\n  res:=comb_tens(res);\nend:" }}}
 {PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 
-270 18 "Coderivation Bases" }}{PARA 256 "" 0 "" {TEXT 256 74 "We desig
-nate the positions of the list and index in the coderivation base." }}
-{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 30 "CBASE_LIST:=1:\nCBASE_IN
-DEX:=2:" }}}{PARA 256 "" 0 "" {TEXT 256 59 "The command below makes a \+
-cbase out of a list and an index." }}{EXCHG {PARA 257 "> " 0 "" 
-{MPLTEXT 1 257 125 "mk_cbase:=proc(List,index)\n  local out, res;\n  r
-es[CBASE_LIST]:=List;\n  res[CBASE_INDEX]:=index;\n  out:=[res[1],res[
-2]];\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 57 "The program below find \+
-the parity of a coderivation base." }}{EXCHG {PARA 257 "> " 0 "" 
-{MPLTEXT 1 257 142 "parity_cbase:=proc(cbas::[list,posint])  \n  local
- i,par;\n  par:=(parity_elem(cbas[CBASE_INDEX])+\n   parity_tbas(cbas[
-CBASE_LIST])) mod 2;\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 63 "The pro
-gram below applies a coderivation base to a tensor base." }}{EXCHG 
-{PARA 257 "> " 0 "" {MPLTEXT 1 257 501 "apply_cbase_tbas:=proc(cbas::[
-list,posint],tbas::list)\n  local res,j,J,k,coef,derterm,otbas,derlist
-;\n  res:=ZEROTENS;\n  J:=cbas[CBASE_LIST];\n  j:=cbas[CBASE_INDEX];\n
-  if tbas=ONE then \n    return(ZEROTENS)\n  fi;\n  for k from 0 to no
-ps(tbas)-nops(J) do\n    coef:=deltaij(J,tbas[k+1..k+nops(J)])*\n     \+
-sgn(parity_tbas(tbas[1..k])*parity_cbase(cbas));\n    otbas:=[op(tbas[
-1..k]),j,\n     op(tbas[k+nops(J)+1..nops(tbas)])];\n    res:=add_tens
-(res,mk_tens(mk_tmon(otbas,coef)));\n  od;\n  comb_tens(res);\nend:" }
-}}{PARA 256 "" 0 "" {TEXT 256 67 "The program below applies a coderiva
-tion base to a tensor monomial." }}{EXCHG {PARA 257 "> " 0 "" 
-{MPLTEXT 1 257 181 "apply_cbase_tmon:=proc(cbas,tmon)\n  local res,coe
-f,tbas;\n  tbas:=tmon[TMON_BASE];\n  coef:=tmon[TMON_COEF];\n  res:=ap
-ply_cbase_tbas(cbas,tbas);\n  res:=rmult_tens_coef(res,coef);\nend:" }
-}}{PARA 258 "" 0 "" {TEXT 258 58 "This next program applies a coderiva
-tion base to a tensor." }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 
-176 "apply_cbase_tens:=proc(cbas,tens)\n  local res,tmon;\n  res:=ZERO
-TENS;\n  for tmon in tens do\n    res:=add_tens(res,apply_cbase_tmon(c
-bas,tmon));\n  od;\n  res:=comb_tens(res);\nend:" }}}{PARA 258 "" 0 "
-" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 270 22 "Coderivati
-on Monomials" }}{PARA 256 "" 0 "" {TEXT 256 79 "We designate positions
- for the base and coeficient in the coderivation monomial" }}{EXCHG 
-{PARA 257 "> " 0 "" {MPLTEXT 1 257 27 "CMON_BASE:=1:\nCMON_COEF:=2:" }
-}}{PARA 256 "" 0 "" {TEXT 256 76 "The command below makes coderivation
- monomials from a base and a coeficient." }}{EXCHG {PARA 257 "> " 0 "
-" {MPLTEXT 1 257 170 "mk_cmon:=proc(cbas)\n  local res,coef;\n  res[CM
-ON_BASE]:=cbas:\n  coef:=ONECOEF;\n  if nargs>1 then \n    coef:=args[
-2];\n  fi;\n  res[CMON_COEF]:=coef;\n  [res[1],res[2]];\nend:" }}}
-{PARA 256 "" 0 "" {TEXT 256 62 "The program below finds the parity of \+
-a coderivation monomial." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 
-101 "parity_cmon:=proc(cmon) \n  parity_cbase(cmon[CMON_BASE])+\n   pa
-rity_coef(cmon[CMON_COEF]) mod 2;\nend:" }}}{PARA 256 "" 0 "" {TEXT 
-256 62 "The program below applies a coderivation monomial to a tensor.
-" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 207 "apply_cmon_tens:=pr
-oc(cmon,tens)\n  local cbas,coef,res,ntens;\n  res:=ZEROTENS;\n  cbas:
-=cmon[CMON_BASE];\n  coef:=cmon[CMON_COEF];\n  ntens:=lmult_tens_coef(
-coef,tens);\n  res:=apply_cbase_tens(cbas,ntens);\nend:" }}}{PARA 258 
-"" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 270 13 "Code
-rivations" }}{PARA 256 "" 0 "" {TEXT 256 22 "The zero coderivation." }
-}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 14 "ZEROCODER:=[]:" }}}
-{PARA 256 "" 0 "" {TEXT 256 68 "The command below makes a coderivation
- from a coderivation monomial." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 
-1 257 34 "mk_coder:=proc(cmon)\n  [cmon]\nend:" }}}{PARA 256 "" 0 "" 
-{TEXT 256 48 "The command below adds two derivations together." }}
-{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 61 "add_coder:=proc(coder1,c
-oder2)\n  [op(coder1),op(coder2)]\nend:" }}}{PARA 258 "" 0 "" {TEXT 
-258 77 "The command below determines the parity, if well defined,  of \+
-a coderivation." }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 282 "pari
-ty_coder:=proc(cder::list)\n  local i,p;\n  if cder=ZEROCODER then \n \+
-   return(0) \n  fi;\n  p:=parity_cmon(cder[1]);\n  for i from 2 to no
-ps(cder) do\n    if parity_cmon(cder[i])<>p then \n      ERROR(\"Parit
-y of this coderivation is not \n       well defined\");\n    fi\n  od;
- \n  p;\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 72 "The command below si
-mplifies a coderivation by combining its like terms." }}{EXCHG {PARA 
-257 "> " 0 "" {MPLTEXT 1 257 685 "comb_coder:=proc(coder)\n  local fin
-al,rest,i,coef,base;\n  if coder=ZEROCODER then \n    return ZEROCODER
- \n  fi;\n  rest:=ZEROCODER;\n  coef:=coder[1][CMON_COEF];\n  base:=co
-der[1][CMON_BASE];\n  for i from 2 to nops(coder) do\n    if coder[i][
-CMON_BASE]=base then\n      coef:=add_coef(coef,coder[i][CMON_COEF])\n
-    else\n      rest:=add_coder(rest,mk_coder(coder[i]))\n    fi;\n  o
-d;\n  if coef<> ZEROCOEF then\n    if rest<>ZEROCODER then\n      fina
-l:=add_coder(mk_coder(mk_cmon(base,coef)),\n       comb_coder(rest));
-\n    else\n      final:=mk_coder(mk_cmon(base,coef));\n    fi;\n  els
-e\n    if rest<>ZEROCODER then\n      final:=comb_coder(rest);\n    el
-se\n      final:=ZEROCODER;\n    fi;\n  fi;\nend:" }}}{PARA 258 "" 0 "
-" {TEXT 258 67 "The command below will add and simplify a sequence of \+
-coderivations" }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 105 "ad:=pr
-oc()\n  local i,out;\n  out:=ZEROCODER;\n  out:=[seq(op(args[i]),i=1..
-nargs)];\n  comb_coder(out);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 57 
-"The following program applies a coderivation to a tensor." }}{EXCHG 
-{PARA 257 "> " 0 "" {MPLTEXT 1 257 148 "apply_coder_tens:=proc(coder,t
-ens)\n  local res,i;\n  res:=[seq(op(apply_cmon_tens(coder[i],tens)),
-\n   i=1..nops(coder))];\n  res:=comb_tens(res);\nend:" }}}{PARA 258 "
-" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 270 25 "Brack
-ets of Coderivations" }}{PARA 256 "" 0 "" {TEXT 256 63 "This routine c
-omputes the composition of two coderivation bases" }}{EXCHG {PARA 257 
-"> " 0 "" {MPLTEXT 1 257 319 "comp_cbase:=proc(cbas1,cbas2)\nlocal out
-,J,j,K,k;\nJ:=cbas1[CBASE_LIST];\nj:=cbas1[CBASE_INDEX];\nK:=cbas2[CBA
-SE_LIST];\nk:=cbas2[CBASE_INDEX];\nout:=[seq(mk_cmon([[op(J[1..i-1]),o
-p(K),op(J[i+1..nops(J)])],j],mk_num_coef(deltaij(J[i],k)*sgn(parity_tb
-as(J[1..i-1])*parity_cbase(cbas2))\n)),i=1..nops(J))];\ncomb_coder(out
-);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 73 "The routine below compute
-s the composition of two coderivation monomials." }}{EXCHG {PARA 257 "
-> " 0 "" {MPLTEXT 1 257 351 "comp_cmon:=proc(cmon1,cmon2)\nlocal cbas1
-,cbas2,coef1,coef2,num,coef,res;\ncbas1:=cmon1[CMON_BASE];\ncbas2:=cmo
-n2[CMON_BASE];\ncoef1:=cmon1[CMON_COEF];\ncoef2:=cmon2[CMON_COEF];\nnu
-m:=sgn(parity_coef(coef1)*parity_cbase(cbas2));\ncoef:=mult_coef(coef1
-,coef2);\ncoef:=mult_coef_num(coef,num);\nres:=comp_cbase(cbas1,cbas2)
-;\nres:=rmult_coder_coef(res,coef);\nend:" }}}{PARA 256 "" 0 "" {TEXT 
-256 62 "The routine below computes the composition of two derivations.
-" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 194 "comp_coder:=proc(co
-der1,coder2)\nlocal i,j, res;\nres:=ZEROCODER;\nfor i to nops(coder1) \+
-do\nfor j to nops(coder2) do\nres:=add_coder(res,comp_cmon(coder1[i],c
-oder2[j]));\nod;od;\ncomb_coder(res);\nend:" }}}{PARA 256 "" 0 "" 
-{TEXT 256 64 "The routine below computes the bracket of two coderivati
-on bases" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 230 "brack_cbase
-:=proc(cbas1,cbas2)\nlocal res1,res2,num,coef;\nres1:=comp_cbase(cbas1
-,cbas2);\nres2:=comp_cbase(cbas2,cbas1);\nnum:=sgn(parity_cbase(cbas1)
-*parity_cbase(cbas2)+1);\ncomb_coder(add_coder(res1,mult_coder_num(num
-,res2)));\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 69 "The routine below \+
-computes the bracket of two coderivation monomials." }}{EXCHG {PARA 
-257 "> " 0 "" {MPLTEXT 1 257 225 "brack_cmon:=proc(cmon1,cmon2)\nlocal
- res1,res2,num,coef;\nres1:=comp_cmon(cmon1,cmon2);\nres2:=comp_cmon(c
-mon2,cmon1);\nnum:=sgn(parity_cmon(cmon1)*parity_cmon(cmon2)+1);\ncomb
-_coder(add_coder(res1,mult_coder_num(num,res2)));\nend:" }}}{PARA 256 
-"" 0 "" {TEXT 256 65 "The routine below computes the bracket of two ge
-neral derivations" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 196 "br
-ack_coder:=proc(coder1,coder2)\nlocal i,j, res;\nres:=ZEROCODER;\nfor \+
-i to nops(coder1) do\nfor j to nops(coder2) do\nres:=add_coder(res,bra
-ck_cmon(coder1[i],coder2[j]));\nod;od;\ncomb_coder(res);\nend:" }}}
-{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 
-270 12 "Exponentials" }}{PARA 268 "" 0 "" {TEXT 268 0 "" }}{EXCHG 
-{PARA 257 "> " 0 "" {MPLTEXT 1 257 104 "adm:= proc(mu,delta,m::nonnegi
-nt)\nif m=0 then \nreturn(delta) \nfi;\nbrack_coder(mu,adm(mu,delta,m-
-1))\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 24 "The function   e^(-adm).
-" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 192 "expm:=proc(mu,delta
-,m::nonnegint)\nlocal i,out,res;\nres:=delta;\nfor i from 1 to m do\no
-ut:=adm(mu,delta,i);\nout:=mult_coder_num((-1)^i/i!,out);\nres:=add_co
-der(res,out);\nod;\ncomb_coder(res);\nend:" }}}{EXCHG {PARA 257 "> " 
-0 "" {MPLTEXT 1 257 121 "power_coder:=proc(mu,tens,n::nonnegint)\nif n
-=0 then \nreturn(tens)\nfi;\napply_coder_tens(mu,power_coder(mu,tens,n
--1));\nend:" }}}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 200 "exp_cod
-er:=proc(mu,tens,m::nonnegint)\nlocal i,term, res;\nres:=tens;\nfor i \+
-from 1 to m do\nterm:=power_coder(mu,tens,i);\nterm:=mult_tens_num(1/i
-!,term);\nres:=add_tens(res,term);\nod;\ncomb_tens(res);\nend:" }}}
-{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 
-270 28 "Prettyprinting Coderivations" }}{PARA 256 "" 0 "" {TEXT 256 
-67 "The following prints a coderivation basis element in standard form
-." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 198 "pnt_cbase:=proc(cb
-as)\nlocal out,thelist,theindex;\nthelist:=cbas[CBASE_LIST];\ntheindex
-:=cbas[CBASE_INDEX];\nif parity_cbase(cbas)=0 then\n'phi'[theindex]^th
-elist;\nelse\n'psi'[theindex]^thelist;\nfi;\nend:" }}}{PARA 268 "" 0 "
-" {TEXT 268 0 "" }}{PARA 256 "" 0 "" {TEXT 256 62 "The following print
-s a coderivation monomial in standard form." }}{EXCHG {PARA 257 "> " 
-0 "" {MPLTEXT 1 257 120 "pnt_cmon:=proc(cmon)\nlocal coef,cbas;\ncoef:
-=cmon[CMON_COEF];\ncbas:=cmon[CMON_BASE];\npnt_cbase(cbas)*pnt_coef(co
-ef);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 75 "The following prints a \+
-coderivation as a sum of monomials in standard form." }}{EXCHG {PARA 
-257 "> " 0 "" {MPLTEXT 1 257 117 "pnt_coder:=proc(coder)\nlocal i;\nif
- coder=ZEROCODER then \nreturn(0)\nfi;\nadd(pnt_cmon(coder[i]),i=1..no
-ps(coder));\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 62 "This routine sho
-ws how the coderivation is applied to a tensor" }}{EXCHG {PARA 257 "> \+
-" 0 "" {MPLTEXT 1 257 137 "showder:=proc(coder,tens)\nlocal res;\nres:
-=apply_coder_tens(coder,tens);\nprint((pnt_coder(coder)*pnt_tens(tens)
-)=pnt_tens(res));\nres;\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}
-{SECT 0 {PARA 270 "" 0 "" {TEXT 270 22 "User Freindly Routines" }}
-{PARA 258 "" 0 "" {TEXT 258 98 "The following routine allows the const
-ruction of a coderivation from a base, an index and a number" }}
-{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 160 "mph:=proc(J,j,c)\nlocal
- cbas,cmon,coder,coef;\ncoef:=1;\nif nargs = 3 then \ncoef:=c \nfi;\nc
-bas:=mk_cbase(J,j);\ncmon:=mk_cmon(cbas,coef);\ncoder:=mk_coder(cmon);
-\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 78 "The following routine multi
-plies a coderivation on the right by a coefficient." }}{EXCHG {PARA 
-259 "> " 0 "" {MPLTEXT 1 259 51 "mc:=proc(cder,coef)rmult_coder_coef(c
-der,coef):end:" }}}{PARA 258 "" 0 "" {TEXT 258 60 "The following routi
-ne prints a coderivation in readable form" }}{EXCHG {PARA 259 "> " 0 "
-" {MPLTEXT 1 259 36 "pc:=proc(L)\nprint(pnt_coder(L))\nend:" }}}{PARA 
-258 "" 0 "" {TEXT 258 78 "The following routine computes a bracket of \+
-two coderivations in readable form" }}{EXCHG {PARA 259 "> " 0 "" 
-{MPLTEXT 1 259 23 "pb:=proc(coder1,coder2)" }}{PARA 259 "> " 0 "" 
-{MPLTEXT 1 259 83 "print([pnt_coder(coder1),pnt_coder(coder2)]=pnt_cod
-er(brack_coder(coder1,coder2))):" }}{PARA 259 "> " 0 "" {MPLTEXT 1 
-259 4 "end:" }}}{PARA 258 "" 0 "" {TEXT 258 62 "The following is a sho
-rt hand version of the bracket operation" }}{EXCHG {PARA 259 "> " 0 "
-" {MPLTEXT 1 259 51 "tb:=proc(cder1,cder2)\nbrack_coder(cder1,cder2)\n
-end:" }}}{PARA 258 "" 0 "" {TEXT 258 90 "The following prints the brac
-ket of two coderivations, without printing the coderivations." }}
-{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 82 "sb:=proc(cder1,cder2)\nl
-ocal res;\nres:=brack_coder(cder1,cder2);\npc(res);\nres;\nend:" }}}
-{PARA 258 "" 0 "" {TEXT 258 96 "The following routine adds a sequence \+
-of coderivations and prints the result in a readable form." }}{EXCHG 
-{PARA 259 "> " 0 "" {MPLTEXT 1 259 138 "pad:=proc()\nlocal i,out;\nout
-:=ZEROCODER;\nfor i from 1 to nargs do \nout:=[op(out),op(args[i])]\no
-d;\nout:=comb_coder(out);\npc(out);\nout;\nend:" }}}{PARA 258 "" 0 "" 
-{TEXT 258 0 "" }}}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}
-{SECT 0 {PARA 269 "" 0 "" {TEXT 269 16 " A-infinity Code" }}{EXCHG 
+270 22 "Coderivation Monomials" }}{PARA 256 "" 0 "" {TEXT 256 79 "We d
+esignate positions for the base and coeficient in the coderivation mon
+omial" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 27 "CMON_BASE:=1:\n
+CMON_COEF:=2:" }}}{PARA 256 "" 0 "" {TEXT 256 76 "The command below ma
+kes coderivation monomials from a base and a coeficient." }}{EXCHG 
+{PARA 257 "> " 0 "" {MPLTEXT 1 257 170 "mk_cmon:=proc(cbas)\n  local r
+es,coef;\n  res[CMON_BASE]:=cbas:\n  coef:=ONECOEF;\n  if nargs>1 then
+ \n    coef:=args[2];\n  fi;\n  res[CMON_COEF]:=coef;\n  [res[1],res[2
+]];\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 62 "The program below finds \+
+the parity of a coderivation monomial." }}{EXCHG {PARA 257 "> " 0 "" 
+{MPLTEXT 1 257 101 "parity_cmon:=proc(cmon) \n  parity_cbase(cmon[CMON
+_BASE])+\n   parity_coef(cmon[CMON_COEF]) mod 2;\nend:" }}}{PARA 256 "
+" 0 "" {TEXT 256 62 "The program below applies a coderivation monomial
+ to a tensor." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 207 "apply_
+cmon_tens:=proc(cmon,tens)\n  local cbas,coef,res,ntens;\n  res:=ZEROT
+ENS;\n  cbas:=cmon[CMON_BASE];\n  coef:=cmon[CMON_COEF];\n  ntens:=lmu
+lt_tens_coef(coef,tens);\n  res:=apply_cbase_tens(cbas,ntens);\nend:" 
+}}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" 
+{TEXT 270 13 "Coderivations" }}{PARA 256 "" 0 "" {TEXT 256 22 "The zer
+o coderivation." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 14 "ZEROC
+ODER:=[]:" }}}{PARA 256 "" 0 "" {TEXT 256 68 "The command below makes \+
+a coderivation from a coderivation monomial." }}{EXCHG {PARA 257 "> " 
+0 "" {MPLTEXT 1 257 34 "mk_coder:=proc(cmon)\n  [cmon]\nend:" }}}
+{PARA 256 "" 0 "" {TEXT 256 48 "The command below adds two derivations
+ together." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 61 "add_coder:
+=proc(coder1,coder2)\n  [op(coder1),op(coder2)]\nend:" }}}{PARA 258 "
+" 0 "" {TEXT 258 77 "The command below determines the parity, if well \+
+defined,  of a coderivation." }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 
+259 282 "parity_coder:=proc(cder::list)\n  local i,p;\n  if cder=ZEROC
+ODER then \n    return(0) \n  fi;\n  p:=parity_cmon(cder[1]);\n  for i
+ from 2 to nops(cder) do\n    if parity_cmon(cder[i])<>p then \n      \+
+ERROR(\"Parity of this coderivation is not \n       well defined\");\n
+    fi\n  od; \n  p;\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 72 "The com
+mand below simplifies a coderivation by combining its like terms." }}
+{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 685 "comb_coder:=proc(coder)
+\n  local final,rest,i,coef,base;\n  if coder=ZEROCODER then \n    ret
+urn ZEROCODER \n  fi;\n  rest:=ZEROCODER;\n  coef:=coder[1][CMON_COEF]
+;\n  base:=coder[1][CMON_BASE];\n  for i from 2 to nops(coder) do\n   \+
+ if coder[i][CMON_BASE]=base then\n      coef:=add_coef(coef,coder[i][
+CMON_COEF])\n    else\n      rest:=add_coder(rest,mk_coder(coder[i]))
+\n    fi;\n  od;\n  if coef<> ZEROCOEF then\n    if rest<>ZEROCODER th
+en\n      final:=add_coder(mk_coder(mk_cmon(base,coef)),\n       comb_
+coder(rest));\n    else\n      final:=mk_coder(mk_cmon(base,coef));\n \+
+   fi;\n  else\n    if rest<>ZEROCODER then\n      final:=comb_coder(r
+est);\n    else\n      final:=ZEROCODER;\n    fi;\n  fi;\nend:" }}}
+{PARA 258 "" 0 "" {TEXT 258 67 "The command below will add and simplif
+y a sequence of coderivations" }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 
+1 259 105 "ad:=proc()\n  local i,out;\n  out:=ZEROCODER;\n  out:=[seq(
+op(args[i]),i=1..nargs)];\n  comb_coder(out);\nend:" }}}{PARA 256 "" 
+0 "" {TEXT 256 57 "The following program applies a coderivation to a t
+ensor." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 148 "apply_coder_t
+ens:=proc(coder,tens)\n  local res,i;\n  res:=[seq(op(apply_cmon_tens(
+coder[i],tens)),\n   i=1..nops(coder))];\n  res:=comb_tens(res);\nend:
+" }}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" 
+{TEXT 270 25 "Brackets of Coderivations" }}{PARA 256 "" 0 "" {TEXT 
+256 63 "This routine computes the composition of two coderivation base
+s" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 342 "comp_cbase:=proc(c
+bas1,cbas2)\n  local out,J,j,K,k;\n  J:=cbas1[CBASE_LIST];\n  j:=cbas1
+[CBASE_INDEX];\n  K:=cbas2[CBASE_LIST];\n  k:=cbas2[CBASE_INDEX];\n  o
+ut:=[seq(mk_cmon([[op(J[1..i-1]),op(K),op(J[i+1..nops(J)])],j],\n    m
+k_num_coef(deltaij(J[i],k)*sgn(parity_tbas(J[1..i-1])*\n    parity_cba
+se(cbas2)))),i=1..nops(J))];\n  comb_coder(out);\nend:" }}}{PARA 256 "
+" 0 "" {TEXT 256 73 "The routine below computes the composition of two
+ coderivation monomials." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 
+371 "comp_cmon:=proc(cmon1,cmon2)\n  local cbas1,cbas2,coef1,coef2,num
+,coef,res;\n  cbas1:=cmon1[CMON_BASE];\n  cbas2:=cmon2[CMON_BASE];\n  \+
+coef1:=cmon1[CMON_COEF];\n  coef2:=cmon2[CMON_COEF];\n  num:=sgn(parit
+y_coef(coef1)*parity_cbase(cbas2));\n  coef:=mult_coef(coef1,coef2);\n
+  coef:=mult_coef_num(coef,num);\n  res:=comp_cbase(cbas1,cbas2);\n  r
+es:=rmult_coder_coef(res,coef);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 
+62 "The routine below computes the composition of two derivations." }}
+{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 219 "comp_coder:=proc(coder1
+,coder2)\n  local i,j, res;\n  res:=ZEROCODER;\n  for i to nops(coder1
+) do\n    for j to nops(coder2) do\n      res:=add_coder(res,comp_cmon
+(coder1[i],coder2[j]));\n    od;\n  od;\n  comb_coder(res);\nend:" }}}
+{PARA 256 "" 0 "" {TEXT 256 64 "The routine below computes the bracket
+ of two coderivation bases" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 
+257 240 "brack_cbase:=proc(cbas1,cbas2)\n  local res1,res2,num,coef;\n
+  res1:=comp_cbase(cbas1,cbas2);\n  res2:=comp_cbase(cbas2,cbas1);\n  \+
+num:=sgn(parity_cbase(cbas1)*parity_cbase(cbas2)+1);\n  comb_coder(add
+_coder(res1,mult_coder_num(num,res2)));\nend:" }}}{PARA 256 "" 0 "" 
+{TEXT 256 69 "The routine below computes the bracket of two coderivati
+on monomials." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 225 "brack_
+cmon:=proc(cmon1,cmon2)\nlocal res1,res2,num,coef;\nres1:=comp_cmon(cm
+on1,cmon2);\nres2:=comp_cmon(cmon2,cmon1);\nnum:=sgn(parity_cmon(cmon1
+)*parity_cmon(cmon2)+1);\ncomb_coder(add_coder(res1,mult_coder_num(num
+,res2)));\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 65 "The routine below \+
+computes the bracket of two general derivations" }}{EXCHG {PARA 257 ">
+ " 0 "" {MPLTEXT 1 257 196 "brack_coder:=proc(coder1,coder2)\nlocal i,
+j, res;\nres:=ZEROCODER;\nfor i to nops(coder1) do\nfor j to nops(code
+r2) do\nres:=add_coder(res,brack_cmon(coder1[i],coder2[j]));\nod;od;\n
+comb_coder(res);\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 
+0 {PARA 270 "" 0 "" {TEXT 270 12 "Exponentials" }}{PARA 268 "" 0 "" 
+{TEXT 268 0 "" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 104 "adm:= \+
+proc(mu,delta,m::nonnegint)\nif m=0 then \nreturn(delta) \nfi;\nbrack_
+coder(mu,adm(mu,delta,m-1))\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 24 "
+The function   e^(-adm)." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 
+192 "expm:=proc(mu,delta,m::nonnegint)\nlocal i,out,res;\nres:=delta;
+\nfor i from 1 to m do\nout:=adm(mu,delta,i);\nout:=mult_coder_num((-1
+)^i/i!,out);\nres:=add_coder(res,out);\nod;\ncomb_coder(res);\nend:" }
+}}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 121 "power_coder:=proc(mu,
+tens,n::nonnegint)\nif n=0 then \nreturn(tens)\nfi;\napply_coder_tens(
+mu,power_coder(mu,tens,n-1));\nend:" }}}{EXCHG {PARA 257 "> " 0 "" 
+{MPLTEXT 1 257 200 "exp_coder:=proc(mu,tens,m::nonnegint)\nlocal i,ter
+m, res;\nres:=tens;\nfor i from 1 to m do\nterm:=power_coder(mu,tens,i
+);\nterm:=mult_tens_num(1/i!,term);\nres:=add_tens(res,term);\nod;\nco
+mb_tens(res);\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 0 "" }}}{SECT 0 
+{PARA 270 "" 0 "" {TEXT 270 28 "Prettyprinting Coderivations" }}{PARA 
+256 "" 0 "" {TEXT 256 67 "The following prints a coderivation basis el
+ement in standard form." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 
+198 "pnt_cbase:=proc(cbas)\nlocal out,thelist,theindex;\nthelist:=cbas
+[CBASE_LIST];\ntheindex:=cbas[CBASE_INDEX];\nif parity_cbase(cbas)=0 t
+hen\n'phi'[theindex]^thelist;\nelse\n'psi'[theindex]^thelist;\nfi;\nen
+d:" }}}{PARA 268 "" 0 "" {TEXT 268 0 "" }}{PARA 256 "" 0 "" {TEXT 256 
+62 "The following prints a coderivation monomial in standard form." }}
+{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 120 "pnt_cmon:=proc(cmon)\nl
+ocal coef,cbas;\ncoef:=cmon[CMON_COEF];\ncbas:=cmon[CMON_BASE];\npnt_c
+base(cbas)*pnt_coef(coef);\nend:" }}}{PARA 256 "" 0 "" {TEXT 256 75 "T
+he following prints a coderivation as a sum of monomials in standard f
+orm." }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 117 "pnt_coder:=proc
+(coder)\nlocal i;\nif coder=ZEROCODER then \nreturn(0)\nfi;\nadd(pnt_c
+mon(coder[i]),i=1..nops(coder));\nend:" }}}{PARA 256 "" 0 "" {TEXT 
+256 62 "This routine shows how the coderivation is applied to a tensor
+" }}{EXCHG {PARA 257 "> " 0 "" {MPLTEXT 1 257 137 "showder:=proc(coder
+,tens)\nlocal res;\nres:=apply_coder_tens(coder,tens);\nprint((pnt_cod
+er(coder)*pnt_tens(tens))=pnt_tens(res));\nres;\nend:" }}}{PARA 258 "
+" 0 "" {TEXT 258 0 "" }}}{SECT 0 {PARA 270 "" 0 "" {TEXT 270 22 "User \+
+Freindly Routines" }}{PARA 258 "" 0 "" {TEXT 258 98 "The following rou
+tine allows the construction of a coderivation from a base, an index a
+nd a number" }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 160 "mph:=pro
+c(J,j,c)\nlocal cbas,cmon,coder,coef;\ncoef:=1;\nif nargs = 3 then \nc
+oef:=c \nfi;\ncbas:=mk_cbase(J,j);\ncmon:=mk_cmon(cbas,coef);\ncoder:=
+mk_coder(cmon);\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 78 "The followin
+g routine multiplies a coderivation on the right by a coefficient." }}
+{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 51 "mc:=proc(cder,coef)rmult
+_coder_coef(cder,coef):end:" }}}{PARA 258 "" 0 "" {TEXT 258 60 "The fo
+llowing routine prints a coderivation in readable form" }}{EXCHG 
+{PARA 259 "> " 0 "" {MPLTEXT 1 259 36 "pc:=proc(L)\nprint(pnt_coder(L)
+)\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 78 "The following routine comp
+utes a bracket of two coderivations in readable form" }}{EXCHG {PARA 
+259 "> " 0 "" {MPLTEXT 1 259 23 "pb:=proc(coder1,coder2)" }}{PARA 259 
+"> " 0 "" {MPLTEXT 1 259 83 "print([pnt_coder(coder1),pnt_coder(coder2
+)]=pnt_coder(brack_coder(coder1,coder2))):" }}{PARA 259 "> " 0 "" 
+{MPLTEXT 1 259 4 "end:" }}}{PARA 258 "" 0 "" {TEXT 258 62 "The followi
+ng is a short hand version of the bracket operation" }}{EXCHG {PARA 
+259 "> " 0 "" {MPLTEXT 1 259 51 "tb:=proc(cder1,cder2)\nbrack_coder(cd
+er1,cder2)\nend:" }}}{PARA 258 "" 0 "" {TEXT 258 90 "The following pri
+nts the bracket of two coderivations, without printing the coderivatio
+ns." }}{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 82 "sb:=proc(cder1,cd
+er2)\nlocal res;\nres:=brack_coder(cder1,cder2);\npc(res);\nres;\nend:
+" }}}{PARA 258 "" 0 "" {TEXT 258 96 "The following routine adds a sequ
+ence of coderivations and prints the result in a readable form." }}
+{EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 138 "pad:=proc()\nlocal i,ou
+t;\nout:=ZEROCODER;\nfor i from 1 to nargs do \nout:=[op(out),op(args[
+i])]\nod;\nout:=comb_coder(out);\npc(out);\nout;\nend:" }}}{PARA 258 "
+" 0 "" {TEXT 258 0 "" }}}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }
+}}{SECT 0 {PARA 269 "" 0 "" {TEXT 269 16 " A-infinity Code" }}{EXCHG 
 {PARA 259 "> " 0 "" {MPLTEXT 1 259 20 "with(LinearAlgebra):" }}}
 {EXCHG {PARA 259 "> " 0 "" {MPLTEXT 1 259 31 "interface(rtablesize=inf
 inity):" }}}{EXCHG {PARA 271 "" 0 "" {TEXT 271 87 "BC makes a list of \+
@@ -1022,5 +1023,6 @@ mension %d is %d|%d`,i,nops(res)-nops(odds),nops(odds)));\nod;\nend:"
 {EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 0 "> " 0 "
 " {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}
 {EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 0 "> " 0 "
-" {MPLTEXT 1 0 0 "" }}}}{MARK "15 2 11 0 0" 71 }{VIEWOPTS 1 1 0 1 1 
-1803 1 1 1 1 }{PAGENUMBERS 0 1 2 33 1 1 }
+" {MPLTEXT 1 0 0 "" }}}{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}
+{EXCHG {PARA 0 "> " 0 "" {MPLTEXT 1 0 0 "" }}}}{MARK "15 6 7 0" 64 }
+{VIEWOPTS 1 1 0 1 1 1803 1 1 1 1 }{PAGENUMBERS 0 1 2 33 1 1 }
