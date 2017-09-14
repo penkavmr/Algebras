@@ -1,0 +1,2149 @@
+
+# The first  PARITY elements in the basis of the vector space will be considered even, and all the rest are odd.
+PARITY:=0:
+DIMENSION:=1:
+# The following defines even and odd.
+ODD:=1:
+EVEN:=0:
+_MaxSols:=infinity:
+# The parity of an element is defined using the above
+parity_elem:=proc(i::posint)
+  if i<=PARITY then
+    return(0)
+  fi;
+  return(1)
+end:
+# The following computes -1 to the argument.
+sgn:=proc(a)
+  (-1)^a;
+end:
+# This is the Kronecker delta function.  It returns 1 if i = j and 0 if not.
+deltaij:=proc(i,j)
+  if i=j then
+    return(1);
+  fi;
+  return(0);
+end:
+
+# Tensor Operations
+# A basic element of the tensor algebra is of the form
+e_I  where I is a list of indices .....
+# Tensor Bases
+# The base for the one tensor is given below.
+ONE:=[]:
+# The command below multiplies the bases for a vector space.
+mult_tbas:=proc(base1::list,base2::list)
+  [op(base1),op(base2)]
+end:
+# The parity of a basis element in the tensor algebra is defined as follows.
+parity_tbas:=proc(tbas::list)
+  if tbas=ONE then
+    return(0)
+  fi;
+  add(parity_elem(tbas[i]),i=1..nops(tbas)) mod 2;
+end:
+
+# Simple Coefficient Procedures
+# This is the zero and one coefficient.
+ZEROCOEF:=0:
+ONECOEF:=1:
+# The command below adds coefficients.
+add_coef:=proc(a,b)
+  a+b;
+end:
+# The command below mulitplies coefficients.
+mult_coef:=proc(a,b)
+  a*b;
+end:
+# Convert a number to a coefficient
+mk_num_coef:=proc(a)
+  mult_coef_num(ONECOEF,a)
+end:
+# A simple rule for the parity of a coefficient.
+parity_coef:=proc(c)
+  0;
+end:
+# A simple way to multipy a coefficient by an ordinary number
+mult_coef_num:=proc(coef,num)
+  coef*num
+end:
+# The way to print normal coefficients
+pnt_coef:=proc(a)
+  a;
+end:
+# Multiply a tensor monomial on the left by a coefficient
+lmult_tmon_coef:=proc(coef,tmon)
+  local c;
+  c:=sgn(parity_coef(coef)*parity_tbase(tmon[TMON_BASE]));
+  c:=mult_coef_num(coef,c);
+  c:=mult_coef(c,tmon[TMON_COEF]);
+  mk_tmon(tmon[TMON_BASE],c);
+end:
+# Multply a tensor on the left by a coefficient
+lmult_tens_coef:=proc(coef,tens)
+  local i,res;
+  if tens=ZEROTENS then
+    return(ZEROTENS)
+  fi;
+  res:=ZEROTENS;
+  for i to nops(tens) do
+    res:=add_tens(res,
+         mk_tens(lmult_tmon_coef(coef,tens[i])));
+  od;
+  comb_tens(res);
+end:
+# Multiply a tensor monomial on the right by a coefficient
+rmult_tmon_coef:=proc(tmon,coef)
+  mk_tmon(tmon[TMON_BASE],mult_coef(tmon[TMON_COEF],coef));
+end:
+# Multiply a tensor on the right by a coefficient
+rmult_tens_coef:=proc(tens,coef)
+  local i,res;
+  if tens=ZEROTENS then
+    return(ZEROTENS)
+  fi;
+  res:=ZEROTENS;
+  for i to nops(tens) do
+    res:=add_tens(res,
+    mk_tens(rmult_tmon_coef(tens[i],coef)));
+  od;
+  comb_tens(res);
+end:
+# Multiply a tensor by a number
+mult_tens_num:=proc(num,tens)
+  rmult_tens_coef(tens,mk_num_coef(num));
+end:
+
+# Tensor Monomials
+# The command below designates the position of the coefficient and the base in a monomial.
+TMON_BASE:=1:
+TMON_COEF:=2:
+# The one and zero monomials are defined below.
+ONETMON:=[ONE,ONECOEF]:
+ZEROTMON:=[ONE,ZEROCOEF]:
+# The command below constructs a monomial from a base and a coefficient.
+mk_tmon:=proc(base::list)
+  local coef,c;
+  coef:=ONECOEF;
+  if nargs>1 then
+    coef:=args[2]
+  fi;
+  if coef<>ZEROCOEF then
+    c[TMON_BASE]:=base:
+    c[TMON_COEF]:=coef:
+    return([c[1],c[2]]):
+  fi;
+ZEROTMON;
+end:
+# The parity of a monomial is computed below.
+parity_tmon:=proc(tmon)
+  parity_tbas(tmon[TMON_BASE])+parity_coef(tmon[TMON_COEF])   mod 2;
+end:
+# This program computes the exterior degree of a tensor monomial
+degree_tmon:=proc(tmon)
+  nops(tmon[TMON_BASE])
+end:
+
+# Tensors
+# The one and zero tensors are defined below.
+ZEROTENS:=[]:
+ONETENS:=[ONETMON]:
+# The command below makes a tensor out of a monomial.
+mk_tens:=proc(tmon)
+  if tmon=ZEROTMON then
+    return(ZEROTENS)
+  fi;
+  [tmon]
+end:
+# The command below adds two tensors together.
+add_tens:=proc(tensor1::list,tensor2::list)
+  [op(tensor1),op(tensor2)]
+end:
+# The command below simplifies a tensor by combining its like terms.
+comb_tens:=proc(tensor::list)
+  local final,rest,i,coef,base;
+  if tensor=ZEROTENS then
+    return ZEROTENS
+  fi;
+  rest:=ZEROTENS;
+  coef:=tensor[1][TMON_COEF];
+  base:=tensor[1][TMON_BASE];
+  for i from 2 to nops(tensor) do
+    if tensor[i][TMON_BASE]=base then
+      coef:=add_coef(coef,tensor[i][TMON_COEF])
+    else
+      rest:=add_tens(rest,mk_tens(tensor[i]))
+    fi;
+  od;
+  if coef<> ZEROCOEF then
+    if rest<>ZEROTENS then
+      final:=add_tens(mk_tens(mk_tmon(base,
+      coef)),comb_tens(rest));
+    else
+      final:=mk_tens(mk_tmon(base,coef));
+    fi;
+  else
+    if rest<>ZEROTENS then
+    final:=comb_tens(rest);
+    else
+      final:=ZEROTENS;
+    fi;
+  fi;
+end:
+# The command below multiplies two tensors together.
+mult_tens:=proc(tens1,tens2)
+  local i,j,coef,final;
+  final:=ZEROTENS;
+  for i to nops(tens1) do
+    for j to nops(tens2) do
+      coef:=(-1)^(parity_coef(tens1[i][TMON_COEF])*
+       parity_tbas(tens2[j][TMON_BASE]));
+      coef:=mult_coef_num(mult_coef(tens1[i][TMON_COEF],
+       tens2[j][TMON_COEF]),coef);
+      final:=add_tens(final,mk_tens(mk_tmon(mult_tbas(
+       tens1[i][TMON_BASE],tens2[j][TMON_BASE]),coef)));
+      od;
+    od;
+  comb_tens(final);
+end:
+# This routine gives the part of a tensor consisting of all monomials of degree less than or equal to a cutoff value.
+cutoff_tens:=proc(tens,cutoff)
+  local i,res;
+  if tens=ZEROTENS then
+    return ZEROTENS
+  fi;
+  res:=ZEROTENS;
+  for i to nops(tens)do
+    if degree_tmon(tens[i])<=cutoff then
+      res:=add_tens(res,mk_tens(tens[i]));
+    fi;
+  od;
+  res;
+end:
+
+# Prettyprinting Tensors
+# The following prints a tensor basis element in standard form.
+pnt_tbase:=proc(tbas)
+  local out;
+  if tbas=ONE then
+    return(1);
+  fi;
+  out:='e'[tbas];
+end:
+
+# The following prints a tensor monomial in standard form.
+pnt_tmon:=proc(tmon)
+local coef,tbas;
+if  tmon=[] then
+return(0);
+fi;
+coef:=tmon[TMON_COEF];
+tbas:=tmon[TMON_BASE];
+pnt_tbase(tbas)*pnt_coef(coef);
+end:
+# The following prints a tensor as a sum of monomials in standard form.
+pnt_tens:=proc(tens)
+local i;
+if tens=ZEROTENS then
+return(0)fi;
+add(pnt_tmon(tens[i]),i=1..nops(tens));
+end:
+
+
+# Coderivation Code
+
+# Coefficients
+# Modify the routines here as appropriate
+# The following program gives the parity of our coefficients.
+parity_coef:=proc()
+  0;
+end:
+# Multiplication of coderivation monomials on the left by a coefficient
+lmult_cmon_coef:=proc(a,L)
+  local res,cbas,ccoef,par,coef;
+  cbas:=L[CMON_BASE];
+  ccoef:=L[CMON_COEF];
+  par:=(-1)^(parity_cbase(cbas)*parity_coef(ccoef));
+  coef:=mult_coef(mult_coef_num(a,par),ccoef);
+  res:=mk_cmon(cbas,coef);
+end:
+# Multiplication of coderivation monomials on the right by a coefficient.
+rmult_cmon_coef:=proc(L,a)
+  local res,cbas,ccoef,par,coef;
+  cbas:=L[CMON_BASE];
+  ccoef:=L[CMON_COEF];
+  coef:=mult_coef(ccoef,a);
+  res:=mk_cmon(cbas,coef);
+end:
+# Multiplication of coderivation monomials by a number
+mult_cmon_num:=proc(n,cmon)
+  local res,coef;
+  coef:=mult_coef_num(ONECOEF,n);
+  lmult_cmon_coef(coef,cmon);
+end:
+# Left multiplication of a general coderivation by a coefficient
+lmult_coder_coef:=proc(a,coder)
+  local i, res, mon;
+  res:=ZEROCODER;
+  for i to nops(coder) do
+    mon:=lmult_cmon_coef(a,coder[i]);
+    res:=[op(res),mon];
+  od;
+  comb_coder(res);
+end:
+# Right multiplication of a general coderivation by a coefficient
+rmult_coder_coef:=proc(coder,a)
+  local i, res, mon;
+  res:=ZEROCODER;
+  for i to nops(coder) do
+    mon:=rmult_cmon_coef(coder[i],a);
+    res:=[op(res),mon];
+  od;
+  comb_coder(res);
+end:
+# Multiplication of a general coderivation by a number
+mult_coder_num:=proc(n,coder)
+  local res,coef;
+  coef:=mult_coef_num(ONECOEF,n);
+  lmult_coder_coef(coef,coder);
+end:
+# Printing a coefficient
+pnt_coef:=proc(c)
+  c;
+end:
+
+# Coderivation Bases
+# We designate the positions of the list and index in the coderivation base.
+CBASE_LIST:=1:
+CBASE_INDEX:=2:
+# The command below makes a cbase out of a list and an index.
+mk_cbase:=proc(List,index)
+  local out, res;
+  res[CBASE_LIST]:=List;
+  res[CBASE_INDEX]:=index;
+  out:=[res[1],res[2]];
+end:
+# The program below find the parity of a coderivation base.
+parity_cbase:=proc(cbas::[list,posint])
+  local i,par;
+  par:=(parity_elem(cbas[CBASE_INDEX])+
+   parity_tbas(cbas[CBASE_LIST])) mod 2;
+end:
+# The program below applies a coderivation base to a tensor base.
+apply_cbase_tbas:=proc(cbas::[list,posint],tbas::list)
+  local res,j,J,k,coef,derterm,otbas,derlist;
+  res:=ZEROTENS;
+  J:=cbas[CBASE_LIST];
+  j:=cbas[CBASE_INDEX];
+  if tbas=ONE then
+    return(ZEROTENS)
+  fi;
+  for k from 0 to nops(tbas)-nops(J) do
+    coef:=deltaij(J,tbas[k+1..k+nops(J)])*
+     sgn(parity_tbas(tbas[1..k])*parity_cbase(cbas));
+    otbas:=[op(tbas[1..k]),j,
+     op(tbas[k+nops(J)+1..nops(tbas)])];
+    res:=add_tens(res,mk_tens(mk_tmon(otbas,coef)));
+  od;
+  comb_tens(res);
+end:
+# The program below applies a coderivation base to a tensor monomial.
+apply_cbase_tmon:=proc(cbas,tmon)
+  local res,coef,tbas;
+  tbas:=tmon[TMON_BASE];
+  coef:=tmon[TMON_COEF];
+  res:=apply_cbase_tbas(cbas,tbas);
+  res:=rmult_tens_coef(res,coef);
+end:
+# This next program applies a coderivation base to a tensor.
+apply_cbase_tens:=proc(cbas,tens)
+  local res,tmon;
+  res:=ZEROTENS;
+  for tmon in tens do
+    res:=add_tens(res,apply_cbase_tmon(cbas,tmon));
+  od;
+  res:=comb_tens(res);
+end:
+
+# Coderivation Monomials
+# We designate positions for the base and coeficient in the coderivation monomial
+CMON_BASE:=1:
+CMON_COEF:=2:
+# The command below makes coderivation monomials from a base and a coeficient.
+mk_cmon:=proc(cbas)
+  local res,coef;
+  res[CMON_BASE]:=cbas:
+  coef:=ONECOEF;
+  if nargs>1 then
+    coef:=args[2];
+  fi;
+  res[CMON_COEF]:=coef;
+  [res[1],res[2]];
+end:
+# The program below finds the parity of a coderivation monomial.
+parity_cmon:=proc(cmon)
+  parity_cbase(cmon[CMON_BASE])+
+   parity_coef(cmon[CMON_COEF]) mod 2;
+end:
+# The program below applies a coderivation monomial to a tensor.
+apply_cmon_tens:=proc(cmon,tens)
+  local cbas,coef,res,ntens;
+  res:=ZEROTENS;
+  cbas:=cmon[CMON_BASE];
+  coef:=cmon[CMON_COEF];
+  ntens:=lmult_tens_coef(coef,tens);
+  res:=apply_cbase_tens(cbas,ntens);
+end:
+
+# Coderivations
+# The zero coderivation.
+ZEROCODER:=[]:
+# The command below makes a coderivation from a coderivation monomial.
+mk_coder:=proc(cmon)
+  [cmon]
+end:
+# The command below adds two derivations together.
+add_coder:=proc(coder1,coder2)
+  [op(coder1),op(coder2)]
+end:
+# The command below determines the parity, if well defined,  of a coderivation.
+parity_coder:=proc(cder::list)
+  local i,p;
+  if cder=ZEROCODER then
+    return(0)
+  fi;
+  p:=parity_cmon(cder[1]);
+  for i from 2 to nops(cder) do
+    if parity_cmon(cder[i])<>p then
+      ERROR("Parity of this coderivation is not
+       well defined");
+    fi
+  od;
+  p;
+end:
+# The command below simplifies a coderivation by combining its like terms.
+comb_coder:=proc(coder)
+  local final,rest,i,coef,base;
+  if coder=ZEROCODER then
+    return ZEROCODER
+  fi;
+  rest:=ZEROCODER;
+  coef:=coder[1][CMON_COEF];
+  base:=coder[1][CMON_BASE];
+  for i from 2 to nops(coder) do
+    if coder[i][CMON_BASE]=base then
+      coef:=add_coef(coef,coder[i][CMON_COEF])
+    else
+      rest:=add_coder(rest,mk_coder(coder[i]))
+    fi;
+  od;
+  if coef<> ZEROCOEF then
+    if rest<>ZEROCODER then
+      final:=add_coder(mk_coder(mk_cmon(base,coef)),
+       comb_coder(rest));
+    else
+      final:=mk_coder(mk_cmon(base,coef));
+    fi;
+  else
+    if rest<>ZEROCODER then
+      final:=comb_coder(rest);
+    else
+      final:=ZEROCODER;
+    fi;
+  fi;
+end:
+# The command below will add and simplify a sequence of coderivations
+ad:=proc()
+  local i,out;
+  out:=ZEROCODER;
+  out:=[seq(op(args[i]),i=1..nargs)];
+  comb_coder(out);
+end:
+# The following program applies a coderivation to a tensor.
+apply_coder_tens:=proc(coder,tens)
+  local res,i;
+  res:=[seq(op(apply_cmon_tens(coder[i],tens)),
+   i=1..nops(coder))];
+  res:=comb_tens(res);
+end:
+
+# Brackets of Coderivations
+# This routine computes the composition of two coderivation bases
+comp_cbase:=proc(cbas1,cbas2)
+  local out,J,j,K,k;
+  J:=cbas1[CBASE_LIST];
+  j:=cbas1[CBASE_INDEX];
+  K:=cbas2[CBASE_LIST];
+  k:=cbas2[CBASE_INDEX];
+  out:=[seq(mk_cmon([[op(J[1..i-1]),op(K),op(J[i+1..nops(J)])],j],
+    mk_num_coef(deltaij(J[i],k)*sgn(parity_tbas(J[1..i-1])*
+    parity_cbase(cbas2)))),i=1..nops(J))];
+  comb_coder(out);
+end:
+# The routine below computes the composition of two coderivation monomials.
+comp_cmon:=proc(cmon1,cmon2)
+  local cbas1,cbas2,coef1,coef2,num,coef,res;
+  cbas1:=cmon1[CMON_BASE];
+  cbas2:=cmon2[CMON_BASE];
+  coef1:=cmon1[CMON_COEF];
+  coef2:=cmon2[CMON_COEF];
+  num:=sgn(parity_coef(coef1)*parity_cbase(cbas2));
+  coef:=mult_coef(coef1,coef2);
+  coef:=mult_coef_num(coef,num);
+  res:=comp_cbase(cbas1,cbas2);
+  res:=rmult_coder_coef(res,coef);
+end:
+# The routine below computes the composition of two derivations.
+comp_coder:=proc(coder1,coder2)
+  local i,j, res;
+  res:=ZEROCODER;
+  for i to nops(coder1) do
+    for j to nops(coder2) do
+      res:=add_coder(res,comp_cmon(coder1[i],coder2[j]));
+    od;
+  od;
+  comb_coder(res);
+end:
+# The routine below computes the bracket of two coderivation bases
+brack_cbase:=proc(cbas1,cbas2)
+  local res1,res2,num,coef;
+  res1:=comp_cbase(cbas1,cbas2);
+  res2:=comp_cbase(cbas2,cbas1);
+  num:=sgn(parity_cbase(cbas1)*parity_cbase(cbas2)+1);
+  comb_coder(add_coder(res1,mult_coder_num(num,res2)));
+end:
+# The routine below computes the bracket of two coderivation monomials.
+brack_cmon:=proc(cmon1,cmon2)
+local res1,res2,num,coef;
+res1:=comp_cmon(cmon1,cmon2);
+res2:=comp_cmon(cmon2,cmon1);
+num:=sgn(parity_cmon(cmon1)*parity_cmon(cmon2)+1);
+comb_coder(add_coder(res1,mult_coder_num(num,res2)));
+end:
+# The routine below computes the bracket of two general derivations
+brack_coder:=proc(coder1,coder2)
+local i,j, res;
+res:=ZEROCODER;
+for i to nops(coder1) do
+for j to nops(coder2) do
+res:=add_coder(res,brack_cmon(coder1[i],coder2[j]));
+od;od;
+comb_coder(res);
+end:
+
+# Exponentials
+
+adm:= proc(mu,delta,m::nonnegint)
+if m=0 then
+return(delta)
+fi;
+brack_coder(mu,adm(mu,delta,m-1))
+end:
+# The function   e^(-adm).
+expm:=proc(mu,delta,m::nonnegint)
+local i,out,res;
+res:=delta;
+for i from 1 to m do
+out:=adm(mu,delta,i);
+out:=mult_coder_num((-1)^i/i!,out);
+res:=add_coder(res,out);
+od;
+comb_coder(res);
+end:
+power_coder:=proc(mu,tens,n::nonnegint)
+if n=0 then
+return(tens)
+fi;
+apply_coder_tens(mu,power_coder(mu,tens,n-1));
+end:
+exp_coder:=proc(mu,tens,m::nonnegint)
+local i,term, res;
+res:=tens;
+for i from 1 to m do
+term:=power_coder(mu,tens,i);
+term:=mult_tens_num(1/i!,term);
+res:=add_tens(res,term);
+od;
+comb_tens(res);
+end:
+
+# Prettyprinting Coderivations
+# The following prints a coderivation basis element in standard form.
+pnt_cbase:=proc(cbas)
+local out,thelist,theindex;
+thelist:=cbas[CBASE_LIST];
+theindex:=cbas[CBASE_INDEX];
+if parity_cbase(cbas)=0 then
+'phi'[theindex]^thelist;
+else
+'psi'[theindex]^thelist;
+fi;
+end:
+
+# The following prints a coderivation monomial in standard form.
+pnt_cmon:=proc(cmon)
+local coef,cbas;
+coef:=cmon[CMON_COEF];
+cbas:=cmon[CMON_BASE];
+pnt_cbase(cbas)*pnt_coef(coef);
+end:
+# The following prints a coderivation as a sum of monomials in standard form.
+pnt_coder:=proc(coder)
+local i;
+if coder=ZEROCODER then
+return(0)
+fi;
+add(pnt_cmon(coder[i]),i=1..nops(coder));
+end:
+# This routine shows how the coderivation is applied to a tensor
+showder:=proc(coder,tens)
+local res;
+res:=apply_coder_tens(coder,tens);
+print((pnt_coder(coder)*pnt_tens(tens))=pnt_tens(res));
+res;
+end:
+
+# User Freindly Routines
+# The following routine allows the construction of a coderivation from a base, an index and a number
+mph:=proc(J,j,c)
+local cbas,cmon,coder,coef;
+coef:=1;
+if nargs = 3 then
+coef:=c
+fi;
+cbas:=mk_cbase(J,j);
+cmon:=mk_cmon(cbas,coef);
+coder:=mk_coder(cmon);
+end:
+# The following routine multiplies a coderivation on the right by a coefficient.
+mc:=proc(cder,coef)rmult_coder_coef(cder,coef):end:
+# The following routine prints a coderivation in readable form
+pc:=proc(L)
+print(pnt_coder(L))
+end:
+# The following routine computes a bracket of two coderivations in readable form
+pb:=proc(coder1,coder2)
+print([pnt_coder(coder1),pnt_coder(coder2)]=pnt_coder(brack_coder(coder1,coder2))):
+end:
+# The following is a short hand version of the bracket operation
+tb:=proc(cder1,cder2)
+brack_coder(cder1,cder2)
+end:
+# The following prints the bracket of two coderivations, without printing the coderivations.
+sb:=proc(cder1,cder2)
+local res;
+res:=brack_coder(cder1,cder2);
+pc(res);
+res;
+end:
+# The following routine adds a sequence of coderivations and prints the result in a readable form.
+pad:=proc()
+local i,out;
+out:=ZEROCODER;
+for i from 1 to nargs do
+out:=[op(out),op(args[i])]
+od;
+out:=comb_coder(out);
+pc(out);
+out;
+end:
+
+
+ A-infinity Code
+with(LinearAlgebra):
+interface(rtablesize=infinity):
+# BC makes a list of length N with l one's and the rest zeros. Returns the nth such list.
+BC:=proc(n::posint,N::posint,l::nonnegint)
+local i,k,x,h,res,out;
+if n>binomial(N,l) then
+ERROR("n exceeds the maximum")
+fi;
+if l=0 then
+return([seq(0,i=1..N)]);
+elif
+l=1 then
+return([seq(0,i=1..n-1),1,seq(0,i=n+1..N)])
+fi;
+x:=0;
+h:=binomial(x+l-l,l);
+while h < n do
+k:=n-h;
+x:=x+1;
+h:=binomial(x+l-1,l);
+od;
+res:=BC(k,N,l-1);
+res[x+l-1]:=1;
+res:
+end:
+# RC returns a list of the positions of one's in the original list.
+RC:=proc(lst::list)
+local i,out;
+out:=[];
+for i from 1 to nops(lst) do
+if lst[i]=1 then
+out:=[op(out),i]
+fi;od;
+out;
+end:
+# AC returns the nth basis element of a tensor of degree k.
+AC:=proc(n::posint,k::nonnegint)
+local i,j,r,s,t,u,m,res,bn,out;
+if k=0
+then
+if n>1 then
+ERROR("n is too large")
+fi;
+return([])
+fi;
+if k=1 then
+return([n])
+fi;
+m:=0;
+while true do
+if (m+1)^k<n then
+m:=m+1;
+next;
+fi;
+break;
+od;
+r:=0;
+while true do
+if n>add(binomial(k,l)*m^(k-l),l=0..r+1) then
+r:=r+1;
+next;
+fi;break;od;
+s:=n-add(binomial(k,l)*m^(k-l),l=0..r);
+t:=0;
+while true do
+if (t+1)*m^(k-r-1)<s then
+t:=t+1;
+next;fi;
+break;od;
+u:=s-t*m^(k-r-1);
+res:=AC(u,k-r-1);
+#print([m,r,s,t,u],[u,k-r-1],[t,k,r+1],res);
+bn:=BC(t+1,k,k-r-1);
+out:=[seq(0,i=1..k)];
+#print([m,r,s,t,u],[u,k-r-1],res,bn);
+i:=1;
+for j from 1 to k do
+if bn[j]=0 then
+out[j]:=m+1
+else
+out[j]:=res[i];
+i:=i+1;
+fi od;
+return(out);
+end:
+
+# BC_inv takes a list that tells which spaces are nonzero spaces of the tensor algebra and gives the number it is in our ordered basis.
+BC_inv:=proc(L)
+local l,n,N,K,M,i,j;
+l:=add(L[i],i=1..nops(L));
+n:=0;
+if l=0 then
+return(1)
+fi;
+N:=nops(L);
+K:=L;
+for i from 0 to N-1 do
+if L[N-i]=0 then
+next
+fi;
+K[N-i]:=K[N-i]-1;
+n:=binomial(N-i-1,l);
+break;
+od;
+n:=n+BC_inv(K);
+end:
+# AC_inv takes a list that represents a basis vector in the tensor algebra and returns the number it is in our ordered basis.
+AC_inv:=proc(L::list)
+local i,k,l,m,r,s,t,u,n,res,bc;
+k:=nops(L);
+if k=0 then
+return(1)
+fi;
+m:=L[1]-1;
+r:=0;
+for i from 2 to k do
+if L[i]=m+1 then
+r:=r+1;
+elif L[i]>m then
+m:=L[i]-1;
+r:=0;
+fi;
+od;
+bc:=[seq(1,i=1..k)];
+res:=[];
+for i to k do
+if L[i]=m+1 then
+bc[i]:=0
+else
+res:=[op(res),L[i]]
+fi;od;
+u:=AC_inv(res);
+t:=BC_inv(bc)-1;
+s:=u+t*m^(k-r-1);
+#print([m,k,r,s,u,t,res,bc]);
+n:=s+add(binomial(k,l)*m^(k-l),l=0..r);
+end:
+
+# The procedure num_chn computes the number of  chains of degree l
+num_chn:=proc(l::nonnegint)
+DIMENSION^l;
+end:
+# The procedure mk_cochn calculates the n-th cochain of degree l.
+mk_cochn:=proc(n::posint,l::nonnegint)
+local out, Q,R,N;
+Q:=iquo(n,DIMENSION,'R');
+if R=0 then
+Q:=Q-1;
+R:=DIMENSION
+fi;
+Q:=Q+1;
+out:=[AC(Q,l),R];
+end:
+# The procedure mk_cochns calculates all cochains of degree l.
+mk_cochns:=proc(l::nonnegint)
+local i,out;
+out:=[]:
+for i from 1 to num_chn(l)*DIMENSION do
+out:=[op(out),mk_cochn(i,l)]
+od;
+out;
+end:
+# The procedure cochn_inv computes the number n for an arbitrary cochain
+# L of degree l such that mk_cochn(n,l)=L
+cochn_inv:=proc(L)
+local K,R,Q,n;
+R:=L[2]:
+K:=L[1]:
+Q:=AC_inv(K):
+Q:=Q-1;
+n:=Q*DIMENSION+R;
+end:
+zmka:=proc()
+local i,j,l:
+global a;
+l:=2:
+if nargs<>0 then
+l:=args[1]
+fi:
+for i from 1 to DIMENSION do
+for j from 1 to num_chn(l) do
+a[i,j]:=0:
+od;
+od;
+end:
+zmkaa:=proc()
+local i,j,l:
+global aa;
+l:=2:
+if nargs<>0 then
+l:=args[1]
+fi:
+for i from 1 to DIMENSION do
+for j from 1 to num_chn(l) do
+aa[i,j]:=0;
+od;
+od;
+end:
+zmkg:=proc()
+local i,j;
+global g;
+for i from 1 to DIMENSION do
+for j from 1 to DIMENSION do
+g[i,j]:=0:
+od:od:
+end:
+umka:=proc()
+local i,j,l;
+global a;
+l:=2:
+if nargs<>0 then
+l:=args[1]
+fi:
+for i from 1 to DIMENSION do
+for j from 1 to num_chn(l) do
+a[i,j]:=0;
+if parity_tbas(AC(j,l))=parity_elem(i) then
+a[i,j]:=0;
+else
+unassign('a[i,j]')
+fi;
+od;
+od;
+end:
+umkaa:=proc()
+local i,j,l:
+global aa;
+l:=2:
+if nargs<>0 then
+l:=args[1]
+fi:
+for i from 1 to DIMENSION do
+for j from 1 to num_chn(l) do
+if parity_tbas(AC(j,l))=parity_elem(i) then
+aa[i,j]:=0;
+else
+unassign('aa[i,j]')
+fi;
+od;
+od;
+end:
+umkg:=proc()
+local i,j;
+global g;
+for i from 1 to DIMENSION do
+for j from 1 to DIMENSION do
+g[i,j]:=0:
+if (parity_elem(i)=EVEN and parity_elem(j)=EVEN) or (parity_elem(i)=ODD and parity_elem(j)=ODD)
+then
+unassign('g[i,j]')
+fi:
+od:od:
+end:
+mka:=proc()
+local l;
+l:=2:
+if nargs<>0 then
+l:=args[1]
+fi:
+Matrix(DIMENSION,num_chn(l),(i,j)->a[i,j])
+end:
+mkaa:=proc()
+local l;
+l:=2:
+if nargs<>0 then
+l:=args[1] fi:
+Matrix(DIMENSION,num_chn(l),(i,j)->aa[i,j])
+end:
+mkg:=proc()
+global g;
+Matrix(DIMENSION,DIMENSION,(i,j)->g[i,j])
+end:
+mattoder:=proc(A)
+local res,i,j,k,M,N;
+res:=ZEROCODER;
+N:=ColumnDimension(A):
+k:=log[DIMENSION](N);
+if not type(k,nonnegint)then error("Improper Matrix Size")fi;
+M:=RowDimension(A):
+for i from 1 to M do
+for j from 1 to N do
+res:=ad(res,mph(AC(j,k),i,A[i,j]));
+od;od;
+end:
+# The command typet computes the degree of a tensor if it contains monomials of the same degree. It returns an error if the tensor is not of homogeneous degree. It doesn't return an error in some cases where the input is not a tensor (MISTAKE). This command is only used in the tenstovec command, which itself is only used in the mkb command which is never used. Thus this command is evidently obsolete.
+typet:=proc()
+local tns,i,deg;
+if nargs=0 then
+tns:=ZEROTENS
+else
+tns:=args[1]
+fi;
+if not type(tns,list) then
+ERROR("Tensor is ill defined")
+fi;
+if tns=ZEROTENS then
+return(0)
+fi;
+deg:=nops(tns[1][TMON_BASE]);
+for i from 2 to nops(tns) do
+if nops(tns[i][TMON_BASE])<>deg then
+ERROR("Not all terms in the tensor have the same degree")
+fi;
+od;
+deg;
+end:
+typed:=proc()
+local cder,i,deg;
+if nargs=0 then cder:=d
+else
+cder:=args[1]
+fi;
+if not type(cder,list) then
+ERROR("Coderivation is ill defined")
+fi;
+if cder=ZEROCODER then
+return(0)
+fi;
+deg:=nops(cder[1][CMON_BASE][CBASE_LIST]);
+for i from 2 to nops(cder) do
+if nops(cder[i][CMON_BASE][CBASE_LIST])<>deg then
+ERROR("Not all terms in the coderivation have the same degree")
+fi;
+od;
+deg;
+end:
+dertomat:=proc(cder::list)
+local cbas,coef,cmon,l,i,j,m,n,c,A;
+l:=2:
+if nargs>1 then
+l:=args[2]
+else
+l:=typed(cder)
+fi;
+n:=num_chn(l);
+m:=DIMENSION;
+A:=Matrix(m,n,0);
+for cmon in cder do
+cbas:=cmon[CMON_BASE];
+coef:=cmon[CMON_COEF];
+A[cbas[CBASE_INDEX],AC_inv(cbas[CBASE_LIST],l)]:=coef;
+od;
+eval(A);
+end:
+vectotens:=proc(L::Vector,l::nonnegint)
+if Dimension(L)<>num_chn(l) then
+ERROR("Mismatch")
+fi;
+[seq([AC(i,l),L[i]],i=1..Dimension(L))];
+end:
+vectoder:=proc(L::Vector,l::nonnegint)
+local out,i,k;
+k:=log[DIMENSION](Dimension(L))-1;
+if not type(k,nonnegint)then error("Improper Vector Size")fi;
+out:=ZEROCODER;
+ad(seq(mph(op(mk_cochn(i,k)),L[i]),i=1..Dimension(L)));
+end:
+tenstovec:=proc(tns::list)
+local i,l,n,out;
+if nargs>1 then l:=args[2]
+else
+l:=typet(tns)
+fi;
+n:=num_chn(l);
+out:=Vector[row]([seq(0,i=1..n)]);
+for i from 1 to nops(tns) do
+out[AC_inv(tns[i][TMON_BASE],l)]:=out[AC_inv(tns[i][TMON_BASE],l)]+tns[i][TMON_COEF];
+od:
+out:
+end:
+dertovec:=proc(cder::list)
+local l,i,n,cmon,cbas,coef,out;
+l:=2:
+if nargs>1 then
+l:=args[2]
+else
+l:=typed(cder)
+fi;
+n:=DIMENSION*num_chn(l);
+out:=Vector([seq(0,i=1..n)]);
+for cmon in cder do
+cbas:=cmon[CMON_BASE];
+coef:=cmon[CMON_COEF];
+out[cochn_inv(cbas,l)]:=out[cochn_inv(cbas,l)]+coef;
+od:
+out;
+end:
+mkphs:=proc(k::nonnegint)
+local c,vec;
+if nargs>1 then
+c:=args[2]
+fi;
+vec:=Vector([seq(c[i],i=1..DIMENSION*num_chn(k))]);
+vectoder(vec,k);
+end:
+# The procedure countsol takes a set of linear equalities and counts the number of such equalities whose left hand side is the same as the right hand side. This is used to count the number of free variables which result from applying a linear operator to a generic basis element, which therefore gives the dimension of the kernel of the operator.
+countsol:=proc(sol)
+local i,cnt;cnt:=0;
+for i to nops(sol) do
+if lhs(sol[i])=rhs(sol[i]) then
+cnt:=cnt+1 fi;
+od;cnt;
+end:
+# The procedure grabsol does not seem to be used in any of the other procedures so it is probably obsolete.
+grabsol:=proc(sol)
+local i,res;res:=[];
+for i to nops(sol) do
+if lhs(sol[i])=rhs(sol[i]) then
+res:=[op(res),lhs(sol[i])]
+fi;
+od;res;
+end:
+# The procedure sc strips out the coefficients of a coderivation and makes them into a set.  It is used as part of the method of solving for when the coefficients are zero, which is the key to finding the kernel of the codifferential applied to some generic element of fixed degree.
+sc:=proc(cder)
+local res,i;
+res:={};
+for i to nops(cder) do
+res:={op(res),cder[i][CMON_COEF]};
+od;
+res;
+end:
+# The procedure mkcoh takes one argument n, which represents the degree of the cochains to be studied. It returns the dimension of the kernel of the coboundary operator applied to cochains of degree n.  It has an optional second argument which represents the name given to the variables used to create the generic cochain of degree n.
+mkcoh:=proc(n::nonnegint)
+global d;
+local i,j,x,res,ans,sol,vars;
+if nargs>1 then
+x:=args[2]
+fi;
+res:=tb(d,mkphs(n,x)):
+ans:=sc(res);
+vars:={seq(x[i],i=1..DIMENSION*num_chn(n))};
+#print(ans,vars);
+sol:=solve(ans,vars);
+countsol(sol);
+end:
+cntco:=proc()
+local deg,i,k,z,b,h,c,n;
+if type(d,list) then
+deg:=typed(d)
+else
+error("The codifferential d is not defined")
+fi;
+if nargs>=1 then
+k:=args[1]
+else
+k:=DIMENSION+1
+fi;
+for i from 0 to k do
+c:=num_chn(i)*DIMENSION;
+z:=mkcoh(i);
+if deg=1 then
+h:=2*z-c;
+elif
+i< deg-1 then
+h:=z:
+else
+h:=z-b[i-deg+1];
+fi;
+b[i]:=c-z:
+print("Cohomology in dimension",i,"is",h);
+od;
+end:
+# The procedure mkq creates the matrix of the extension of the linear automorphism g of the space V to a map from V^k to V^k, where k is the argument of the procedure, which must be a nonnegative integer.
+mkq:=proc()
+local i,j,k,l,n,A;
+global g;
+l:=2:
+if nargs>0 then
+l:=args[1]fi;
+n:=num_chn(l);
+A:=Matrix(n,n,(i,j)->product(g[AC(i,l)[k],AC(j,l)[k]],k=1..l)):
+end:
+# The procedure mkb does not appear to be used in any of the other procedures so is probably obsolete.
+mkb:=proc()
+local B,l,i,vec,k,n,m,vecs;
+global d;
+if type(d,list) then
+k:=typed(d)
+else
+error(d,"is not a codifferential")
+fi;
+l:=2*k-1:
+if nargs>1 then
+l:=args[2]
+fi;
+m:=num_chn(l):
+n:=num_chn(l-k+1):
+vecs:=[]:
+B:=Matrix([seq(convert(tenstovec(apply_coder_tens(d,mk_tens(mk_tmon((AC(i,l))))),l-k+1),list),i=1..n)]):
+Transpose(B);
+end:
+
+mksol:=proc(vars)
+local i,j,neqs,deg,exeq;
+global M1,M2,allsol,A,g,AA;
+exeq:={};
+if nargs>1 then
+exeq:=args[2];
+fi;
+if nargs>2 then
+deg:=args[3];
+elif
+type(d,list) then
+deg:=typed(d);
+else
+deg:=2;
+fi;
+M1:=simplify(A.mkq(deg)):
+M2:=mkq(1).AA:
+neqs:=[seq(seq(M1[i,j]=M2[i,j],i=1..DIMENSION),j=1..num_chn(deg))]:
+allsol:={solve({op(neqs),op(exeq)},{op(vars)})}:
+nops(allsol);
+end:
+mkm:=proc(L)
+local var,eq,M,i,j,k,l;
+M:=Matrix(DIMENSION,DIMENSION,0);
+for i from 1 to DIMENSION do
+for j from 1 to DIMENSION do
+for eq in L do
+var:=lhs(eq);
+if var=g[i,j] then
+M[i,j]:=rhs(eq)
+fi;
+od;od;od;
+M;
+end:
+cksol:=proc()
+ local i,dt,nosol,tmp;
+ global allsol,thsols;
+ nosol:=0;
+ thsols:=[];
+ tmp:=1:
+ if nargs>0 then
+  if args[nargs]='print=false' then tmp:=0 fi:
+ fi;
+ for i from 1 to nops(allsol) do
+  dt:=simplify(Determinant(mkm(allsol[i]))):
+  if dt <>0 then
+   nosol:=1;
+   thsols:=[op(thsols),i];
+   #print("determinant of solution",i, factor(dt));
+   #print(mkm(allsol[i]));
+  fi;
+ od;
+ if nosol=0 then
+  if tmp=1 then
+   print("No Solutions");
+  fi:
+  return(false);
+ else
+  if tmp=1 then
+   print("The solutions with nonzero determinant are",thsols);
+  fi:
+  return(true);
+ fi;
+end:
+getvars:=proc(A::Matrix)
+local i,j,vars;
+vars:={};
+indets({seq(seq(A[i,j],i=1..RowDimension(A)),j=1..ColumnDimension(A))});
+end:
+whatrel:=proc(n)
+local dt,vartypes,eq,var;
+vartypes:={};
+if nargs=1 and type(exvar,set) then
+vartypes:=exvar;
+else
+vartypes:=args[2]
+fi;
+print(mkm(allsol[n]));
+dt:=simplify(Determinant(mkm(allsol[n])));
+print(determinant=factor(simplify(dt)));
+for eq in allsol[n] do
+for var in vartypes do
+if lhs(eq)=var then
+print(factor(eq))
+fi
+od;
+od;
+end:
+stg:=proc(M::Matrix)
+global g,DIMENSION;
+local i,j;
+if RowDimension(M)<>DIMENSION or ColumnDimension(M)<> DIMENSION then
+error("Matrix has wrong size") fi;
+for i from 1 to DIMENSION do
+for j from 1 to DIMENSION do
+g[i,j]:=M[i,j]:
+od;od;
+end:
+sta:=proc(M::Matrix)
+global a,DIMENSION;
+local i,j,k;
+k:=ColumnDimension(M);
+if nargs>1 then
+k:=args[2]
+fi;
+if k<>ColumnDimension(M) then
+error("Matrix has wrong number of columns for stated degree")
+fi;
+if RowDimension(M)<> DIMENSION then
+error("Matrix has wrong number of rows")
+fi;
+for i from 1 to DIMENSION do
+for j from 1 to k do
+a[i,j]:=M[i,j]:
+od;od;
+end:
+mkmatrix:=proc(n)
+local i,j,deg,M;
+if type(d,list) then
+deg:=typed(d)else error("Can't find the degree of the codifferential", d)
+fi;
+Transpose(Matrix([seq(convert(dertovec(tb(d,mph(op(mk_cochn(i,n)))),n+deg-1),list),i=1..num_chn(n)*DIMENSION)]));
+end:
+cnker:=proc(A)
+local eq,cnt,C,Y,i,j,m,n,y,vartp,vars,var;
+global THESOL;
+vars:=[];
+if nargs>1 then
+vars:=args[2]
+fi;
+m:=RowDimension(A);
+n:=ColumnDimension(A);
+Y:=Matrix(n,1,[seq([y[i]],i=1..n)]);
+C:=A.Y;
+THESOL:=[solve({seq(C[i,1],i=1..m)})]:
+print("Number of solutions:",nops(THESOL));
+for i from 1 to nops(THESOL) do
+cnt:=n;vartp:={};
+for eq in THESOL[i] do
+for j from 1 to n do
+if lhs(eq)=y[j] and rhs(eq)<>y[j] then
+cnt:=cnt-1
+fi;od;
+for var in vars do
+if lhs(eq)=var then
+vartp:={op(vartp),eq}
+fi;od;
+od;
+print([i,cnt,vartp]);od;
+end:
+Colbasis:=proc(A::Matrix)
+local i,rk,c,r,crk,k,nrk,out;
+k:=0;
+out:=[];
+c:=ColumnDimension(A);
+r:=RowDimension(A);
+if nargs>1 and type(args[2],nonnegint) then
+k:=args[2] fi;
+if k>c then
+ERROR("The Column dimension of the matrix is too small")
+fi;
+rk:=0;
+nrk:=0;
+if k>0 then
+rk:=nops(RowSpace(SubMatrix(A,1..r,1..k)));
+fi;
+for i from k+1 to c do
+nrk:=nops(RowSpace(SubMatrix(A,1..r,1..i)));
+if nrk>rk then
+rk:=nrk;out:=[op(out),Column(A,i)];
+fi;
+od;
+out;
+end:
+cohobasis:=proc(n::nonnegint)
+local k,i,cders,res,coh,vars,V,coc,deg,Y,C,bas;
+if type(d,list) then
+deg:=typed(d)
+else
+error("Can't find the degree of the codifferential", d)
+fi;
+vars:={}:
+if nargs=2 and type(args[2],set) then
+vars:=args[2]
+fi;
+V:=mkmatrix(n);
+if vars<>{} then
+cnker(V,vars)fi;
+coc:=[op(NullSpace(V))];
+if coc=[] then return([])fi;
+Y:=convert(coc,Matrix);
+if n<deg-1 then
+cders:=map(vectoder,coc,n);
+#map(pc,cders):
+return(cders);
+fi;
+V:=mkmatrix(n-deg+1);
+C:=<<V|Y>>;
+k:=ColumnDimension(V);
+coh:=Colbasis(C,k);
+cders:=map(vectoder,coh,n);
+#map(pc,cders):
+return(cders);
+end:
+scmat:=proc(A::matrix)
+{seq(seq(A[i,j],i=1..rowdim(A)),j=1..coldim(A))}:
+end:
+issamevec:=proc(X::Vector,Y::Vector)
+local i,n;
+n:=Dimension(X);
+if Dimension(Y)<>n then
+error("Vectors have different lengths")fi;
+for i from 1 to n do
+if X[i]<>Y[i] then
+return(false)
+fi;
+od;
+return(true);
+end:
+coboprebasis:=proc(n::nonnegint)
+local i,j,k,V,B,vars,res;
+if type(d,list) then
+k:=typed(d)
+else
+error(d,"is not a codifferential")
+fi;
+if n+1 < k then
+return([])
+fi;
+vars:={}:
+if nargs=2 and type(args[2],set) then
+vars:=args[2]
+fi;
+res:=[];
+V:=mkmatrix(n-k+1);
+if vars<>{} then
+cnker(V,vars)
+fi;
+B:=Colbasis(V);
+for i from 1 to nops(B) do
+for j from 1 to ColumnDimension(V) do
+if issamevec(B[i],Column(V,j)) then
+res:=[op(res),mph(op(mk_cochn(j,n-k+1)))];
+break;
+fi
+od;
+od;
+res:
+end:
+assignphis:=proc(cders,psi)
+local i,k,par;
+par:=1;
+if nargs>2 then
+par:=args[3]
+fi;
+unassign('psi');
+k:=1;
+for i from 1 to nops(cders)
+do
+if parity_cbase(cders[i][CMON_BASE][CBASE_LIST])=par then
+psi[k]:=cders[i];
+k:=k+1;
+fi;
+od;
+for i from 1 to k-1 do
+print(''psi''[i]=pnt_coder(psi[i]))
+od;
+end:
+cobobasis:=proc(n::nonnegint)
+local i,j,k,V,B,res,vars;
+if type(d,list) then
+k:=typed(d)
+else
+error(d,"is not a codifferential")
+fi;
+if n+1 < k then
+return([])
+fi;
+res:=[];
+vars:={}:
+if nargs=2 and type(args[2],set) then
+vars:=args[2]
+fi;
+V:=mkmatrix(n-k+1);
+if vars<>{} then
+cnker(V,vars)
+fi;
+B:=ColumnSpace(V):
+for i from 1 to nops(B) do
+res:=[op(res),vectoder(B[i],n)];
+od;
+res:
+end:
+gettypes:=proc(L::list,p)
+local cder,res;
+res:=[];
+for cder in L do
+if parity_coder(cder)=p then
+res:=[op(res),cder]
+fi;
+od:
+res:
+end:
+versal:=proc(d)
+local i,k,ptst,nogood,j,m,dinf,
+taus,numdeltas,numgammas,numbetas,numtaus,numalphas,thebracket;
+global t,A,S,ASOL,PSOL,DINF,RELS,_MaxSols,deltas,alphas,betas,gammas;
+if type(d,list) then
+k:=typed(d)
+else
+error(d,"is not a codifferential")
+fi;
+A:=dertomat(d,k);
+if nargs>1 then
+deltas:=gettypes(args[2],1):
+else
+print("computing a basis of the cohomology in degree",k);
+deltas:=gettypes(cohobasis(k,getvars(A)),1):
+print("A basis of the cohomology in degree",k);
+print(map(pnt_coder,deltas));
+fi;
+numdeltas:=nops(deltas);
+print("The basis of the cohomology in degree",k,"has",numdeltas,"elements.");
+print("computing a prebasis of the",2*k-1,"coboundaries");
+gammas:=gettypes(coboprebasis(2*k-1,getvars(A)),1):
+numgammas:=nops(gammas);
+print("The prebasis of the coboundaries in degree",k,"has",numgammas,"elements.");
+betas:=[seq(mc(tb(d,gammas[i]),2),i=1..numgammas)];
+print("A basis of the coboundaries of degree",2*k-1);
+print(map(pnt_coder,betas));
+numbetas:=nops(betas);
+print("The basis of the coboundaries in degree",2*k-1,"has",numbetas,"elements.");
+if nargs>2 then
+alphas:=gettypes(args[3],0);
+else
+print("computing a basis of the cohomology in degree",2*k-1);
+alphas:=gettypes(cohobasis(2*k-1,getvars(A)),0):
+fi;
+numalphas:=nops(alphas):
+print("A basis of the cohomology in degree",2*k-1);
+print(map(pnt_coder,alphas));
+print("The basis of the cohomology in degree",2*k-1,"has",numalphas,"elements.");
+print("computing a prebasis of the",3*k-2,"coboundaries");
+taus:=gettypes(coboprebasis(3*k-2,getvars(A)),0):
+numtaus:=nops(taus):
+print("The prebasis of the coboundaries in degree",3*k-2,"has",numtaus,"elements.");
+#print(map(pnt_coder,taus));
+dinf:=ad(d,seq(mult_coder_num('t'[i],deltas[i]),i=1..numdeltas),seq(mult_coder_num('x'[i],gammas[i]),i=1..numgammas)):
+thebracket:=dertovec(tb(dinf,dinf)):
+print("Computing the matrix of the versal deformation");
+A:=ReducedRowEchelonForm(Matrix([seq(dertovec(alphas[i]),i=1..numalphas),seq(dertovec(betas[i]),i=1..numbetas),seq(dertovec(taus[i]),i=1..numtaus),thebracket]));
+RELS:=[seq(A[i,numalphas+numbetas+numtaus+1],i=1..numalphas)];
+S:={seq(A[i,numalphas+numbetas+numtaus+1],i=numalphas+1..numalphas+numbetas)};
+ASOL:={};
+print("Solving for the x variables");
+PSOL:=simplify([solve(S,{seq('x'[i],i=1..numgammas)})]);
+for i from 1 to nops(PSOL) do
+ptst:=subs(seq(x[m]=0,m=1..numgammas),seq(t[m]=0,m=1..numdeltas),PSOL[i]);
+#print(ptst);
+nogood:=0:
+for j from 1 to nops(ptst)
+do
+if rhs(ptst[j])<>0 then nogood:=1;break;fi:
+od:
+if nogood=0 then ASOL:=PSOL[i]:break;fi;
+od:
+print(ASOL);#return;
+print("Computing the versal deformation");
+RELS:={op(subs(ASOL,RELS))};
+DINF:=psubs(ASOL,dinf):
+print("Versal Deformation Computed"):
+end:
+# The procedure ckit compares one codifferential versus all of the codifferentials in a dimension.
+ckit:=proc(der)
+ local num,i,j,x,y,z,w,excond,exvars,mytype,svars,Mat1,Mat2,neqs,omit,lvout,pnt;
+ global A,AA,G,Q,vars,thsols,allsol,whichsol,MAXTYPE,_MaxSols;
+ _MaxSols:=10000;
+ AA:=dertomat(der,2);
+ if nargs>1 then mytype:=args[2];
+ elif thetype<>"" then mytype:=thetype;
+ else ERROR("No type file to search specified");
+ fi:
+ pnt:=typeoptions(initial=[0,0],seq(args[i],i=1..nargs)):
+ if nargs>2 then if nops(args[3])=1 then x:=args[3]; fi;fi;
+ if nargs>3 then if nops(args[4])=1 then y:=args[4]; fi;fi:
+ if nargs>4 then if nops(args[5])=1 then z:=args[5]; fi;fi;
+ if nargs>5 then if nops(args[6])=1 then w:=args[6]; fi;fi;
+ exvars:={};
+ omit:={};
+ if nargs>6 then
+  if type(args[7],set) then
+   omit:=args[7];
+  fi;
+ fi;
+ whichsol:=[];
+ for i from 1 to mytype() do
+  if pnt[1]=1 then
+   print("Checking type",i);
+  fi;
+  if omit<>{} then
+   lvout:=0;
+   for j in omit do
+    if i=j then
+     if pnt[1]=1 then
+      print("omitting type",i);
+     fi;
+     lvout:=1;
+     break;
+    fi;
+   od;
+   if lvout=1 then lvout:=0;next;fi;
+  fi:
+  if pnt[1]=1 then
+   A:=dertomat(mytype(i,x,y,z,w,print=true,shiftit=pnt[2]));
+  else
+   A:=dertomat(mytype(i,x,y,z,w,print=false,shiftit=pnt[2]));
+  fi;
+  umkg();G:=mkg():Q:=mkq():
+  vars:={op(exvars),op(getvars(A)),op(getvars(AA)),op(getvars(G))};
+  svars:={op(exvars),op(getvars(A)),op(getvars(AA))};
+  excond:={};
+  Mat1:=simplify(evalm(simplify(A&*Q))):
+  Mat2:=evalm(G&*AA):
+  neqs:=[seq(seq(Mat1[i,j]=Mat2[i,j],i=1..DIMENSION),j=1..num_chn(2))]:
+  allsol:={solve({op(neqs),op(excond)},vars)}:
+  if pnt[1]=1 then
+   if cksol() then whichsol:=[op(whichsol),i] fi;
+  else
+   if cksol(print=false) then whichsol:=[op(whichsol),i] fi;
+  fi:
+ od;
+ print("The types with solutions are",whichsol);
+end:
+ckit:=proc(der)
+ local num,i,j,x,y,z,w,excond,exvars,mytype,svars,Mat1,Mat2,neqs,omit,lvout,pnt;
+ global A,AA,G,Q,vars,thsols,allsol,whichsol,MAXTYPE,_MaxSols;
+ _MaxSols:=10000;
+ AA:=dertomat(der,2);
+ if nargs>1 then mytype:=args[2];
+ elif thetype<>"" then mytype:=thetype;
+ else ERROR("No type file to search specified");
+ fi:
+ pnt:=typeoptions(initial=[0,0],seq(args[i],i=1..nargs)):
+ if nargs>2 then if nops(args[3])=1 then x:=args[3]; fi;fi;
+ if nargs>3 then if nops(args[4])=1 then y:=args[4]; fi;fi:
+ if nargs>4 then if nops(args[5])=1 then z:=args[5]; fi;fi;
+ if nargs>5 then if nops(args[6])=1 then w:=args[6]; fi;fi;
+ exvars:={};
+ omit:={};
+ if nargs>6 then
+  if type(args[7],set) then
+   omit:=args[7];
+  fi;
+ fi;
+ whichsol:=[];
+ for i from 1 to mytype() do
+  if i in omit then next fi;
+  if pnt[1]=1 then
+     print("Checking type",i);
+  fi;
+  A:=dertomat(mytype(i,x,y,z,w,print=false,shiftit=pnt[2]));
+  umkg();G:=mkg():Q:=mkq():
+  vars:={op(exvars),op(getvars(A)),op(getvars(AA)),op(getvars(G))};
+  svars:={op(exvars),op(getvars(A)),op(getvars(AA))};
+  excond:={};
+  Mat1:=simplify(A.Q):
+  Mat2:=simplify(G.AA):
+  neqs:=[seq(seq(Mat1[i,j]=Mat2[i,j],i=1..DIMENSION),j=1..num_chn(2))]:
+  allsol:={solve({op(neqs),op(excond)},vars)}:
+  if pnt[1]=1 then
+   if cksol() then whichsol:=[op(whichsol),i] fi;
+  else
+   if cksol(print=false) then whichsol:=[op(whichsol),i] fi;
+  fi:
+ od;
+ print("The types with solutions are",whichsol);
+if nops(whichsol)>0 then return(true)else return(false)fi;
+end:
+
+# The routine below is used after the routine above to obtain the relations
+
+compare:=proc(der1,der2)
+local num,i,x,y,z,w,excond,exvars,svars,Mat1,Mat2,neqs;
+global A,AA,G,Q,vars,thsols,allsol,_MaxSols;
+_MaxSols:=10000;
+AA:=dertomat(der2,2);
+exvars:={};if nargs>2 then exvars:=args[3]fi;
+A:=dertomat(der1,2);
+print(evalm(A),evalm(AA));
+umkg();G:=mkg():Q:=mkq():
+vars:={op(exvars),op(getvars(A)),op(getvars(AA)),op(getvars(G))};
+svars:={op(exvars),op(getvars(A)),op(getvars(AA))};
+excond:={};
+Mat1:=AA.Q:
+Mat2:=G.A:
+neqs:=[seq(seq(Mat1[i,j]=Mat2[i,j],i=1..DIMENSION),j=1..num_chn(2))]:
+allsol:={solve({op(neqs),op(excond)},vars)}:
+cksol():
+#allrels2(svars);
+end:
+ncompare:=proc(der1,der2)
+local num,i,x,y,z,w,excond,exvars,svars,Mat1,Mat2,neqs;
+global A,AA,G,Q,vars,thsols,allsol,_MaxSols;
+_MaxSols:=10000;
+AA:=dertomat(der2,2);
+exvars:={};if nargs>2 then exvars:=args[3]fi;
+A:=dertomat(der1,2);
+#print(evalm(A),evalm(AA));
+umkg();G:=mkg():Q:=mkq():
+vars:={op(exvars),op(getvars(A)),op(getvars(AA)),op(getvars(G))};
+svars:={op(exvars),op(getvars(A)),op(getvars(AA))};
+excond:={};
+Mat1:=AA.Q:
+Mat2:=G.A:
+neqs:=[seq(seq(Mat1[i,j]=Mat2[i,j],i=1..DIMENSION),j=1..num_chn(2))]:
+allsol:={solve({op(neqs),op(excond)},vars)}:
+cksol():
+#allrels2(svars);
+end:
+
+# The routine below is used after the routine above, it displays the relavent relations.
+showrel:=proc()
+local num,L,exvars;
+global A,AA,G,Q,vars,thsols;
+L:=thsols;if nargs>0 then L:=args[1]fi;
+exvars:={};if nargs>1 then exvars:=args[2]fi;
+for num in L
+do
+print("working on",num);
+whatrel(num,{op(exvars),op(getvars(A)),op(getvars(AA))});
+od:
+end:
+# The routine below shifts the codifferential's elements up at least one
+shiftit:=proc(cder)
+ local out,n,cmon,coef,cod,i,ncod,j,k;
+ if cder=ZEROCODER then return ZEROCODER fi;
+ n:=1:
+ if nargs>1 then n:=args[2] fi:
+ out:=[]:
+ if type(n,integer) then
+  for cmon in cder do
+   coef:=cmon[2];
+   cod:=cmon[1];
+   ncod:=[]:
+   for i to nops(cod[1]) do
+    ncod:=[op(ncod),cod[1][i]+n]:
+   od;
+   out:=ad(out,mph(ncod,cod[2]+n,coef)):
+  od;
+  return(out);
+ fi;
+ if type(n,list) then
+  out:=cder;
+  for i to nops(n) do
+   for j to nops(cder) do
+    cmon:=cder[j][1];
+    for k to nops(cmon[1]) do
+     if cmon[1][k]=i then
+      out[j][1][1][k]:=n[i];
+     fi;
+    od;
+    if cmon[2]=i then
+     out[j][1][2]:=n[i];
+    fi;
+   od;
+  od;
+ return(out);
+ fi;
+end:
+psubs:=proc(subseq,lst)pad(subs(subseq,lst)):end:
+allrels2:=proc()
+local num, eq, var, vars,slop,AAA;
+global A,AA,thsols, allsol;
+vars:={}:if nargs>0 then vars:=args[1]fi;
+for num in thsols do
+print("working on ",num):
+slop:={op(map(convert,[op(allsol[num])],radical))}:
+AAA:=mkm(slop):
+print(AAA):
+print(determinant=factor(simplify(Determinant(AAA))));
+for eq in slop do
+for var in vars do
+if lhs(eq)=var then
+print(simplify(eq))
+fi
+od;
+od;
+od;
+end:
+mk_ker:=proc(A::Matrix)
+local r,n,i,j,pivots,lastpivot,nulls,dims,res,B,vec,nullbas;
+dims:=Dimension(A):
+lastpivot:=0;
+pivots:=[];
+nullbas:=[];
+nulls:=[];
+B:=ReducedRowEchelonForm(A):
+for i from 1 to dims[1]
+do
+for j from lastpivot+1 to dims[2]
+do
+lastpivot:=j;
+if B[i,j]<>0 then
+pivots:=[op(pivots),j];
+break;
+fi;
+nulls:=[op(nulls),j];
+od;
+od;
+nulls:=[op(nulls),seq(i,i=lastpivot+1..dims[2])];
+r:=nops(pivots);
+n:=nops(nulls);
+for j from 1 to n
+do
+vec:=Vector([seq(0,i=1..dims[2])]);
+for i from 1 to r
+do
+vec[pivots[i]]:=-B[i,nulls[j]];
+od;
+vec[nulls[j]]:=1;
+nullbas:=[op(nullbas),vec];
+od;
+nullbas:
+end:
+Colbasis:=proc(A::Matrix)
+local B,i,rk,c,r,dims,k,pivots,lastpivot,j;
+k:=0;lastpivot:=0;pivots:=[];
+dims:=[Dimension(A)];
+#c:=ColumnDimension(A);
+#r:=RowDimension(A);
+if nargs>1 and type(args[2],nonnegint) then k:=args[2] fi;
+if k>dims[2] then ERROR("The Column dimension of the matrix is too small")fi;
+B:=ReducedRowEchelonForm(A):
+for i from 1 to dims[1]
+do
+for j from lastpivot+1 to dims[2]
+do
+if B[i,j]<>0 then
+if j>k then pivots:=[op(pivots),j]fi;
+lastpivot:=j;
+break;
+fi;
+lastpivot:=j;
+od;
+if lastpivot=dims[2] then break fi;
+od;
+return([Column(A,pivots)]);
+end:
+facent:=proc(A::Matrix)
+local i,j,B;
+B:=Matrix(Dimension(A)):
+for i from 1 to RowDimension(A)do
+for j from 1 to ColumnDimension(A)do
+B[i,j]:=factor(A[i,j]):
+od;
+od:
+B;
+end:
+extend:=proc(init)
+local i,tmp,tp,len,out,a;
+tmp:=[];
+out:=[]:
+if init=[] then len:=0:else len:=nops(init[nops(init)]);fi:
+for i to nops(init)
+do
+if nops(init[i])=len then tmp:=[op(tmp),init[i]]:fi;
+od;
+if len<PARITY then out:=[op(out),[op(tmp[1]),0]]fi;
+for tp in tmp do
+if (add(tp[i],i=1..nops(tp))<(DIMENSION-PARITY) and nops(tp)<DIMENSION-1)
+then
+out:=[op(out),[op(tp),1]]:
+fi:
+od:
+out:
+end:
+mkgM:=proc()
+local L,gM,i,eL,oL,nume,numo,j;
+L:=[[]]:
+for i to DIMENSION-1 do L:=[op(L),op(extend(L))]:od;
+L:=[seq(L[i],i=2..nops(L))];
+gM:=L:
+eL:=[seq(i,i=1..PARITY)]:
+oL:=[seq(i,i=PARITY+1..DIMENSION)]:
+for i to nops(L) do
+nume:=1:
+numo:=1:
+for j to nops(L[i]) do
+if L[i][j]=0 then
+gM[i][j]:=eL[nume]:
+nume:=nume+1:
+fi:
+if L[i][j]=1 then
+gM[i][j]:=oL[numo]:
+numo:=numo+1:
+fi:
+od:
+od:
+gM;
+end:
+mkgW:=proc(M1)
+local M,W,i,gW,j;
+gW:=[]:
+for j to nops(M1) do
+M:=sort(M1[j]):
+W:=[seq(i,i=1..DIMENSION)];
+for i to nops(M) do
+W[M[i]]:=0:
+od:
+W:=[op({op(W)})]:
+W:=[seq(W[i],i=2..nops(W))];
+gW:=[op(gW),W]:
+od;
+gW:
+end:
+gmaps:=proc(M1::list)
+local ind,i,j,k,tmp;
+global M,W,glambda,gpsi,gbeta;
+if nops(M1)>DIMENSION-1 or nops(M)<0 then error("M is too large or small")fi:
+M:=sort(M1):
+W:=[seq(i,i=1..DIMENSION)];
+for i to nops(M) do
+W[M[i]]:=0:
+od:
+W:=[op({op(W)})]:
+W:=[seq(W[i],i=2..nops(W))];
+glambda:=ZEROCODER:
+gpsi:=ZEROCODER:
+gbeta:=ZEROCODER:
+ind:=1:
+for i to nops(W) do
+for j to nops(W) do
+for k to nops(M) do
+tmp:=mph([W[i],W[j]],M[k],c[ind]):
+if parity_coder(tmp)=1 then;
+gpsi:=ad(gpsi,tmp):
+ind:=ind+1:
+fi:
+od:
+od:
+od:
+ind:=1:
+for i to nops(W) do
+for j to nops(M) do
+tmp:=mph([W[i]],M[j],b[ind]):
+if parity_coder(tmp)=0 then;
+gbeta:=ad(gbeta,tmp):
+ind:=ind+1:
+fi:
+od:
+od:
+mkdeltamu(M,W):
+GenG(M,W):
+nmkglambda();
+if nargs>1 and (args[2]='banana' or args[2]='print') then
+#print('lambda'=pnt_coder(glambda)):
+print(mklmat(glambda)):
+print('psi'=pnt_coder(gpsi)):
+print('beta'=pnt_coder(gbeta)):
+print("mu=mytypeM"=mytypeM):
+print("delta=mytypeW"=mytypeW):
+print('M'=M);
+print('W'=W);
+print('G'=G);
+fi;
+end:
+restrictions:=proc(mu,delta,M1::list)
+local i,anslam,ansmc,lambda,bracdlp,bracmc,ans,psi,mbcobound,ansl:
+global TH:
+bracdlp:=proc(delta,lambda,psi)
+local dl, ans,temp,i;
+dl:=ad(delta,lambda):
+ans:=[op({solve(sc(tb(dl,psi)))})]:
+temp:=[]:
+if ans=[] then
+return([[lambda,psi]]):
+else
+for i to nops(ans) do
+temp:=[op(temp),[subs(ans[i],lambda),subs(ans[i],psi)]]:
+od:
+fi:
+return(temp):
+end:
+bracmc:=proc(delta,mu,lambda,psi)
+local ans,temp,i;
+ans:=[op({solve(sc(ad(tb(delta,lambda),mc(tb(lambda,lambda),1/2),tb(mu,psi))))})];
+temp:=[]:
+if ans=[] then
+return([[lambda,psi]]);
+else
+for i to nops(ans) do
+temp:=[op(temp),[subs(ans[i],lambda),subs(ans[i],psi)]];
+od:
+fi:
+return(temp):
+end:
+mbcobound:=proc(res)
+local i,result,ans,dum,mbco,j;
+result:=res;
+for i to nops(result) do
+mbco:=ad(tb(mu,gbeta),result[i]):
+ans:=[op({solve(sc(mbco))})]:
+if tb(mu,gbeta)<>ZEROCODER then
+dum:=[1,nops(mbco)]:
+for j to nops(ans) do
+if nops(subs(ans[j],mbco))<dum[2] then
+dum:=[j,nops(subs(ans[j],mbco))]:
+fi;
+od;
+if ans<>[] then
+result[i]:=subs(ans[dum[1]],mbco):
+fi:
+fi:
+od;
+  result:=[op({op(result)})];
+ end:
+ gmaps(M1):
+ ansl:=[op({solve(sc(tb(mu,glambda)))})]:
+ anslam:=[]:
+ if ansl=[] then
+  anslam:=[glambda]:
+ else
+  for i to nops(ansl) do
+   lambda:=subs(ansl[i],glambda):
+   anslam:=[op(anslam),lambda]:
+  od:
+ fi:
+ anslam:=mbcobound(anslam):
+ ansmc:=[]:
+ for i to nops(anslam) do
+   lambda:=anslam[i]:
+   ansmc:=[op(ansmc),op(bracmc(delta,mu,lambda,gpsi))];
+ od:
+ ans:=[]:
+ for i to nops(ansmc) do
+   ans:=[op(ans),op(bracdlp(delta,ansmc[i][1],ansmc[i][2]))]:
+ od:
+ if nargs>3 then
+  if args[4]='print' then
+   for i to nops(ans) do
+    print('lambda'=pnt_coder(ans[i][1]));
+    print('psi'=pnt_coder(ans[i][2]));
+    print("------------------------------------------------------------"):
+   od;
+  fi;
+ fi;
+ ans:
+end:
+mkd:=proc(clist)
+ local out,i:
+ out:=[]:
+ for i to nops(clist) do;
+  out:=[op(out),ad(delta,mu,clist[i][1],clist[i][2])];
+ od;
+ out;
+end:
+parity_base:=proc(tbas::list)
+ nops(tbas)-add(parity_elem(tbas[i]),i=1..nops(tbas));
+end:
+mkdeltamu:=proc(M,W)
+ global mytypeM,mytypeW;
+ if parity_base(M)=nops(M) then
+  mytypeM:=atypex0;
+ else
+  mytypeM:=atype||(parity_base(M))||(nops(M)-parity_base(M));
+ fi:
+ if parity_base(W)=nops(W) then
+  mytypeW:=atypex0;
+ else
+  mytypeW:=atype||(parity_base(W))||(nops(W)-parity_base(W));
+ fi;
+ return;
+end:
+GenG:=proc()
+ local i,j;
+ global g,G,M,W;
+ umkg():
+ for i to nops(M) do
+  for j to nops(W) do
+   g[M[i],W[j]]:=0;g[W[j],M[i]]:=0:
+  od;
+ od;
+ G:=mkg();
+ end:
+fsubs:=proc()factor(subs(args))end:
+deform:=proc(d,n)
+local alp,alphas,gam,gammas,bet,betas,tau,taus,res,res1,ans,dinf,tst,i,j,zerox,thes,ans1;
+global t,DINF,RELS,Z,ZZ;
+print("Computing a basis of the 2-cocycles"):
+res:=gettypes(cohobasis(2),1);
+print(map(pnt_coder,res));
+dinf:=factor(ad(d,seq(mc(res[i],t[i]),i=1..nops(res)))):
+pc(dinf);
+tst:=pad(factor(tb(dinf,dinf))):
+if tst=ZEROCODER then
+print("The infinitesimal deformation is versal and there are no relations"):
+DINF:=dinf;RELS:={}:
+return():
+fi;
+print("Computing a basis of the 3-cocycles"):
+alp:=gettypes(cohobasis(3),0):print(map(pnt_coder,alp));
+alphas:=ad(seq(mc(alp[i],-r[i]),i=1..nops(alp))):
+print("Computing a prebasis of the 3-coboundaries"):
+gam:=gettypes(coboprebasis(3),1):
+gammas:=ad(seq(mc(gam[i],x[i]),i=1..nops(gam))):
+print("Computing a basis of the 3-coboundaries"):
+bet:=[seq(mc(tb(d,gam[i]),-2),i=1..nops(gam))]:
+betas:=ad(seq(mc(tb(d,gam[i]),2*s[i]),i=1..nops(gam))):
+print("Computing a prebasis of the 4-coboundaries"):
+tau:=gettypes(coboprebasis(4),0):
+print("The number of 4-coboundaries is",nops(tau));
+taus:=ad(seq(mc(tau[i],u[i]),i=1..nops(tau))):
+print("Computing the versal deformation");
+DINF:=ad(dinf,gammas);
+res:=ad(tb(DINF,DINF),betas,alphas,taus);
+ans:=solve(sc(res),{seq(r[i],i=1..nops(alp)),seq(s[i],i=1..nops(gam)),seq(u[i],i=1..nops(tau))});
+RELS:=subs(ans,{seq(r[i],i=1..nops(alp))}):
+ZZ:=[seq(0,i=1..nops(gam))];
+res1:=subs(seq(x[i]=0,i=1..nops(gam)),ans);
+for j from 1 to n do:
+print("Computing the",j,"th order deformation");
+Z:=factor(subs(res1,[seq(s[i],i=1..nops(gam))]));
+print('Z'=Z):
+if Z=[seq(0,i=1..nops(gam))]
+then
+print("The versal deformation is given by the", j,"th order deformation"):
+DINF:=pad(factor(subs(seq(x[i]=ZZ[i],i=1..nops(gam)),DINF)));
+#RELS:=subs(res1,{seq(r[i],i=1..nops(alp))});
+RELS:=subs(seq(x[i]=ZZ[i],i=1..nops(gam)),RELS);
+print("Versal Deformation Computed");
+return():
+fi;
+for i from 1 to nops(gam) do ZZ[i]:=ZZ[i]+Z[i];od;
+res1:=subs(seq(x[i]=ZZ[i],i=1..nops(gam)),ans);
+od;
+#print('Z'=subs(res1,[seq(s[i],i=1..nops(gam))]));
+#ZZ:=subs(res1,[seq(u[i],i=1..nops(tau))]);
+#pc(subs(seq(u[i]=ZZ[i],i=1..nops(tau)),taus));
+print("Versal Deformation not given by the",n,"order deformation, attempting to compute it another way.");
+Z:=factor(subs(res1,[seq(s[i],i=1..nops(gam))]));
+zerox:={};
+for i from 1 to nops(gam) do if ZZ[i]=0 then zerox:={op(zerox),x[i]=0} fi od;
+thes:=subs(ans,[seq(s[i],i=1..nops(gam))]);
+print([zerox,thes]);
+print("solving for the x variables");
+ans1:=solve({op(zerox),op(thes)},{seq(x[i],i=1..nops(gam))});
+DINF:=pad(factor(subs(ans1,DINF)));
+RELS:={op(subs(ans1,RELS))};
+print("Versal deformation Computed");
+end:
+findopp:=proc()
+local coef,omit,cmon,cbas,clist,cind,der,nder;
+global d;
+if nargs<>0 then der:=args[1];else der:=d;fi;
+omit:={};if nargs>1 then omit:=args[2];fi;
+nder:=ZEROCODER;
+for cmon in der do
+cbas:=cmon[1];
+clist:=cbas[1]:
+cind:=cbas[2]:
+coef:=sgn(parity_tbas(cbas[1]))*cmon[2];
+nder:=ad(nder,mph([clist[2],clist[1]],cind,coef)):
+od;
+pc(nder):
+if nargs>1 then ckit(nder,thetype,x,y,z,w,omit):else ckit(nder):fi;
+nder;
+end:
+ckans:=proc(n)
+local eqn,res;
+res:={seq(fsubs(seq(t[i]=0,i=1..100),lhs(ans[n][i]))=fsubs(seq(t[i]=0,i=1..100),numer(rhs(ans[n][i]))),i=1..nops(ans[n]))};
+print(res):
+for eqn in res do if lhs(eqn)<>rhs(eqn) then return(false)fi;od;
+return(true):
+end:
+ncntco:=proc()
+local deg,i,k,res,odds;
+if type(d,list) then
+deg:=typed(d)
+else
+error("The codifferential d is not defined")
+fi;
+if nargs>=1 then
+k:=args[1]
+else
+k:=DIMENSION+1
+fi;
+for i from 0 to k do
+res:=cohobasis(i):
+odds:=gettypes(res,1):
+print(sprintf(`Cohomology in dimension %d is %d|%d`,i,nops(res)-nops(odds),nops(odds)));
+od;
+end:
+
+
+
+
+
+
+
+
+
+
+
+
+

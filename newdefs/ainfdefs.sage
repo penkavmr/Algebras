@@ -382,4 +382,10 @@ def apply_coder_tens(coder, tens):
 
 ##=======================  Coderivation Brackets  ========================##
 # compute composition of two coderivation bases
-def comp_cbase(cbas1, cbas2):
+#def comp_cbase(cbas1, cbas2):
+
+
+
+
+
+
