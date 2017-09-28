@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+
+mapleFunctions=( "`grep -Po '^[^#].*?(?=:=proc)' ../maple/ainfdefs.txt`" )
+
+for func in ${mapleFunctions[@]}; do
+    printf "$func\n"
+done

@@ -504,14 +504,6 @@ comp_coder:=proc(coder1,coder2)
   od;
   comb_coder(res);
 end:
-# The routine below computes the bracket of two coderivation bases
-brack_cbase:=proc(cbas1,cbas2)
-  local res1,res2,num,coef;
-  res1:=comp_cbase(cbas1,cbas2);
-  res2:=comp_cbase(cbas2,cbas1);
-  num:=sgn(parity_cbase(cbas1)*parity_cbase(cbas2)+1);
-  comb_coder(add_coder(res1,mult_coder_num(num,res2)));
-end:
 # The routine below computes the bracket of two coderivation monomials.
 brack_cmon:=proc(cmon1,cmon2)
 local res1,res2,num,coef;
@@ -519,6 +511,14 @@ res1:=comp_cmon(cmon1,cmon2);
 res2:=comp_cmon(cmon2,cmon1);
 num:=sgn(parity_cmon(cmon1)*parity_cmon(cmon2)+1);
 comb_coder(add_coder(res1,mult_coder_num(num,res2)));
+end:
+# The routine below computes the bracket of two coderivation bases
+brack_cbase:=proc(cbas1,cbas2)
+  local res1,res2,num,coef;
+  res1:=comp_cbase(cbas1,cbas2);
+  res2:=comp_cbase(cbas2,cbas1);
+  num:=sgn(parity_cbase(cbas1)*parity_cbase(cbas2)+1);
+  comb_coder(add_coder(res1,mult_coder_num(num,res2)));
 end:
 # The routine below computes the bracket of two general derivations
 brack_coder:=proc(coder1,coder2)

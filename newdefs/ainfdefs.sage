@@ -380,11 +380,48 @@ def apply_coder_tens(coder, tens):
         tens_result = tens_result + apply_cmon_tens(cmon, tens)
     return comb_tens(tens_result)
 
+
 ##=======================  Coderivation Brackets  ========================##
-# compute composition of two coderivation bases
+# !: These appear to be broken in the original Maple code.
+
 #def comp_cbase(cbas1, cbas2):
+    # called by: comp_cmon(), brack_cbase()
+
+#def brack_cbase(cbas1, cbas2):
+    # called by nothing
+
+#def comp_cmon(cmon1, cmon2):
+    # called by: comp_coder(), brack_cmon()
+
+#def brack_cmon(cmon1, cmon2):
+    # called by: brack_coder()
+
+#def comp_coder(coder1, coder2):
+    # called by nothing
+
+#def brack_coder(coder1, coder2):
+    # called by: adm(), pc(), pb(), tb(), sb()
+
+# !: But these can't be broken, this is core code!  Right now, anything I use
+# as input in the maple code just returns an empty list...
+
+# Let's trace brack_coder() farther:
+
+#adm():
+    # called by: expm()
+    #expm():
+        # called by nothing
+#pc():
+    # called by: sb(), pad(), deform(), findopp()
+#pb():
+    # called by nothing
+#tb():
+    # called by: mkcoh(), mkmatrix(), versal(), bracdlp(),
+#sb():
+    # called by nothing
 
 
+##============================  Exponentials  ============================##
 
 
 
