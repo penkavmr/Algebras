@@ -381,39 +381,21 @@ def apply_coder_tens(coder, tens):
 
 
 ##=======================  Coderivation Brackets  ========================##
+# composition of two coderivation bases
 def comp_cbase(cbas1, cbas2):
     J = cbas1[CBASE_LIST]
     j = cbas1[CBASE_INDEX]
     K = cbas2[CBASE_LIST]
     k = cbas2[CBASE_INDEX]
-
-
     coder_result = ZEROCODER
     for i in range(len(J)):
-
-        print [J[:i]+K+J[i+1:],j]
-        print deltaij(J[i],k)
-
-        print parity_tbas(J[i+1:])
-        print parity_cbase(cbas2)
-
-        print parity_tbas(J[i+1:]) * parity_cbase(cbas2)
-
-        #print Sgn(Integer(parity_tbas(J[i+1:])))
-        #print Sgn(Integer(parity_cbase(cbas2)))
-
-        print Sgn(Integer(parity_tbas(J[i+1:])) * Integer(parity_cbase(cbas2)))
-
-        print "============"
-
-        #coder_result = coder_result + mk_cmon([J[:i]+K+J[i+1:],j],
-            #mk_num_coef(deltaij(J[i],k) * Sgn(parity_tbas(J[i+1:]) *
-            #parity_cbase(cbas2))))
-    #return comb_coder(coder_result)
+        coder_result = coder_result + [mk_cmon([J[:i]+K+J[i+1:],j],
+        mk_num_coef(deltaij(J[i],k) * Sgn(Integer(parity_tbas(J[i:])) *
+        Integer(parity_cbase(cbas2)))))]
+    return comb_coder(coder_result)
 
 
-#def comp_cbase(cbas1, cbas2):
-     #called by: comp_cmon(), brack_cbase()
+
 
 #def brack_cbase(cbas1, cbas2):
     # called by nothing
