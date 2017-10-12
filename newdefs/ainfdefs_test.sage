@@ -1,7 +1,7 @@
 #!/usr/bin/env sage
 
 import os
-##===========================  test_ainfdefs.sage  ===========================##
+##===========================  ainfdefs_test.sage  ===========================##
 # This script tests the functions in `ainfdefs.sage` against the expected
 # return values from the original Maple code.
 
