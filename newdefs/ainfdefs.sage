@@ -105,7 +105,7 @@ def parity_elem(i):
 
 # (-1)^i
 def Sgn(i):
-     return (-1) ** (i % 2)
+    return (-1) ** (Integer(i) % 2)
 
 
 ##=======================  Coefficient Functions  ========================##
@@ -390,11 +390,29 @@ def comp_cbase(cbas1, cbas2):
     coder_result = ZEROCODER
     for i in range(len(J)):
         coder_result = coder_result + [mk_cmon([J[:i]+K+J[i+1:],j],
-        mk_num_coef(deltaij(J[i],k) * Sgn(Integer(parity_tbas(J[i:])) *
-        Integer(parity_cbase(cbas2)))))]
+        mk_num_coef(deltaij(J[i],k) * Sgn(parity_tbas(J[i:]) *
+        parity_cbase(cbas2))))]
     return comb_coder(coder_result)
 
+# composition of two coderivation monomials
+def comp_cmon(cmon1, cmon2):
+    cbas1 = cmon1[CMON_BASE]
+    cbas2 = cmon2[CMON_BASE]
+    coef1 = cmon1[CMON_COEF]
+    coef2 = cmon2[CMON_COEF]
+    num = Sgn(Integer(parity_coef(coef1) * parity_cbase(cbas2)))
+    coef = mult_coef(coef1, coef2)
+    coef = mult_coef_num(coef, num)
+    res = comp_cbase(cbas1, cbas2)
+    return rmult_coder_coef(res, coef)
 
+# composition of two coderivations
+def comp_coder(coder1, coder2):
+    result = ZEROCODER
+    for cmon1 in coder1:
+        for cmon2 in coder2:
+            result = result + comp_cmon(cmon1, cmon2)
+    return comb_coder(result)
 
 
 #def brack_cbase(cbas1, cbas2):
