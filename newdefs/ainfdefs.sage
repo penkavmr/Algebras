@@ -411,45 +411,43 @@ def comp_coder(coder1, coder2):
     result = ZEROCODER
     for cmon1 in coder1:
         for cmon2 in coder2:
-            result = result + comp_cmon(cmon1, cmon2)
+            result = add_coder(result, comp_cmon(cmon1, cmon2))
+    return comb_coder(result)
+
+# bracket of two coderivation bases
+def brack_cbase(cbas1, cbas2):
+    res1 = comp_cbase(cbas1, cbas2)
+    res2 = comp_cbase(cbas2, cbas1)
+    num = Sgn(parity_cbase(cbas1) * parity_cbase(cbas2) + 1)
+    return comb_coder(add_coder(res1, mult_coder_num(num, res2)))
+
+# bracket of two coderivation monomials
+def brack_cmon(cmon1, cmon2):
+    res1 = comp_cmon(cmon1, cmon2)
+    res2 = comp_cmon(cmon2, cmon1)
+    num = Sgn(parity_cmon(cmon1) * parity_cmon(cmon2) + 1)
+    return comb_coder(add_coder(res1, mult_coder_num(num, res2)))
+
+# bracket of two coderivations
+def brack_coder(coder1, coder2):
+    result = ZEROCODER
+    for cmon1 in coder1:
+        for cmon2 in coder2:
+            result = add_coder(result, brack_cmon(cmon1, cmon2))
     return comb_coder(result)
 
 
-#def brack_cbase(cbas1, cbas2):
-    # called by nothing
-
-#def comp_cmon(cmon1, cmon2):
-    # called by: comp_coder(), brack_cmon()
-
-#def brack_cmon(cmon1, cmon2):
-    # called by: brack_coder()
-
-#def comp_coder(coder1, coder2):
-    # called by nothing
-
-#def brack_coder(coder1, coder2):
-    # called by: adm(), pc(), pb(), tb(), sb()
-
-# !: But these can't be broken, this is core code!  Right now, anything I use
-# as input in the maple code just returns an empty list...
-
-# Let's trace brack_coder() farther:
-
-#adm():
-    # called by: expm()
-    #expm():
-        # called by nothing
-#pc():
-    # called by: sb(), pad(), deform(), findopp()
-#pb():
-    # called by nothing
-#tb():
-    # called by: mkcoh(), mkmatrix(), versal(), bracdlp(),
-#sb():
-    # called by nothing
-
-
 ##============================  Exponentials  ============================##
+# exponential of two coderivations
+def adm(mu, delta, m):
+    if m==0:
+        return delta
+    elif m<0:
+        print 'ERROR: adm() requires a non-negative integer power'
+        return -1  # returns -1 on error
+    else:
+        return brack_coder(mu,adm(mu,delta,m-1))
+
 
 
 
