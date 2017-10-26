@@ -449,6 +449,13 @@ def adm(mu, delta, m):
         return brack_coder(mu,adm(mu,delta,m-1))
 
 
-
+def rTest(a, m):
+    print ""
+    print "a = " + str(a)
+    print "m = " + str(m)
+    if m==1:
+        return a
+    else:
+        return a * rTest(a, m-1)
 
 
