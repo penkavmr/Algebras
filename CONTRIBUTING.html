@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
-<title>Z2 Graded Complex Associative Algebras</title>
+<title>Working on this Project</title>
 <style type="text/css">
 
 /*======================  dark.css  ======================*/
@@ -542,104 +542,40 @@ ul.auto-toc {
 </style>
 </head>
 <body>
-<div class="document" id="z2-graded-complex-associative-algebras">
-<h1 class="title">Z2 Graded Complex Associative Algebras</h1>
+<div class="document" id="working-on-this-project">
+<h1 class="title">Working on this Project</h1>
 
-<p>This SageMath project is an undertaking to classify the moduli space
-of low dimensional Z2 graded complex associative algebras.</p>
-<p>Previously, much of this work was done using various versions of
-Maple mathematics software.  This project is a rewriting of the
-original Maple code into the Sage/Python programming language.
-This currently consists of two phases:</p>
-<ol class="arabic simple">
-<li>Convert all Maple functions verbatim (same names, inputs, and
-outputs). This will aid in understanding what exactly the code
-is doing and ease the transition for experienced researchers.</li>
-<li>Object orient the SageMath code.  This will likely require a
-good amount of code to be rewritten from scratch.</li>
-</ol>
+<p>All new students, please read this before working on this project.</p>
+<div class="section" id="github">
+<h1>Github</h1>
+<p>Github is the defacto way of sharing and collaborating on open source
+software projects.  If you don't have a github account, get one now.
+Github uses <a class="reference external" href="https://git-scm.com/">git</a>, which is completely free and compatible with all
+operating system.  If you don't have git installed on your computer,
+do it now.</p>
+</div>
+<div class="section" id="python">
+<h1>Python</h1>
+<p>This project is a rewriting of Maple code to Python code.  In the name
+of readablity and accessablity to future contributors, please have a
+read of the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">python style guide</a>.  In particular, please limit line
+lengths to 72 characters, use 4 spaces as indentation, and comment
+your code as much as possible.</p>
+</div>
+<div class="section" id="sagemath">
+<h1>SageMath</h1>
+<p><a class="reference external" href="http://www.sagemath.org/">SageMath</a> is highly capable free and open source mathematics software
+system.  If you don't have it on your computer, install it now.  You
+can also use Sage for free in a web browser at <a class="reference external" href="https://cocalc.com/">CoCalc</a>.  If you don't
+have a CoCalc account, sign up for one.  Eventually we plan to have
+a CoCalc instance running on the BGSC.</p>
+</div>
 <div class="section" id="code">
 <h1>Code</h1>
-<p>New SageMath code is located in the <tt class="docutils literal">newdefs/</tt> folder.</p>
-<dl class="docutils">
-<dt><tt class="docutils literal">newdefs/ainfdefs.sage</tt></dt>
-<dd>SageMath code containing the verbatim rewriting of the
-original Maple functions.</dd>
-<dt><tt class="docutils literal">newdefs/test_ainfdefs.sage</tt></dt>
-<dd><p class="first">Script to check the output of the new SageMath functions with
-the expected output of the original Maple functions.  This can
-be executed directly from a shell prompt:</p>
-<pre class="literal-block">
-./test_ainfdefs.sage
-</pre>
-<p>or from within a SageMath session:</p>
-<pre class="last literal-block">
-execfile('test_ainfdefs.sage')
-</pre>
-</dd>
-</dl>
-<p>The original Maple code is in the <tt class="docutils literal">maple/</tt> folder.  Maple
-worksheets (<tt class="docutils literal">.mws</tt>) are only viewable in Maple (from which they
-can be exported as text).</p>
-<dl class="docutils">
-<dt><tt class="docutils literal">maple/ainfdefs.mws</tt></dt>
-<dd>Original Maple worksheet (circa 2001) containing all the
-global variables and function definitions used to build and
-deform Z2 graded algebras.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs.txt</tt></dt>
-<dd>Text version of the original Maple worksheet.  Functions
-have been properly formatted with indentation as we convert
-them to SageMath.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs_new.mws</tt></dt>
-<dd>A properly formatted version of <tt class="docutils literal">ainfdefs.mws</tt> for
-easier readability.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs_tests.mws</tt></dt>
-<dd>Maple worksheet containing test cases of functions from
-<tt class="docutils literal">ainfdefs.mws</tt>.  These test cases are compared with the
-output of our new SageMath functions via the
-<tt class="docutils literal">test_ainfdefs.sage</tt> script.</dd>
-</dl>
-</div>
-<div class="section" id="sagemath-on-the-bgsc-cluster">
-<h1>SageMath on the BGSC Cluster</h1>
-<div class="section" id="sage-notebook">
-<h2>Sage notebook</h2>
-<p>It is currently possible to run a sage notebook server on the
-BGSC and access it from a local machine with the following steps.</p>
-<ol class="arabic">
-<li><p class="first">SSH into the BGSC forwarding port 8080 to your local machine:</p>
-<pre class="literal-block">
-ssh -L 8080:localhost:8080 USERNAME&#64;bgsc.uwec.edu
-</pre>
-</li>
-<li><p class="first">Navigate to the SageMath directory on the BGSC:</p>
-<pre class="literal-block">
-cd /data/software/sage*
-</pre>
-</li>
-<li><p class="first">Run Sage:</p>
-<pre class="literal-block">
-./sage
-</pre>
-</li>
-<li><p class="first">Within SageMath, start the notebook server:</p>
-<pre class="literal-block">
-notebook(accounts=true)
-</pre>
-</li>
-<li><p class="first">Open a web browser on your local machine to
-<tt class="docutils literal"><span class="pre">http://localhost:8080</span></tt></p>
-</li>
-</ol>
-</div>
-<div class="section" id="cocalc">
-<h2>CoCalc</h2>
-<p>Eventually it would be nice to permanently host a full fledged
-CoCalc server on the BGSC.  This is entirely possible using a
-<a class="reference external" href="https://github.com/sagemathinc/cocalc/blob/master/src/dev/docker/README.md">CoCalc Docker image</a>.  Unfortunately, the installation and
-setup of this image needs to be done by a BGSC admin and is not
-on their list of priorities.</p>
-</div>
+<p>The new python code is all contained in the <em>/newdefs/</em> folder.
+<em>ainfdefs.sage</em> is the new set of function definitions.
+<em>ainfdefs_test.sage</em> is a series of tests to test the output of the
+new functions against the output of the original Maple code.</p>
 </div>
 </div>
 </body>

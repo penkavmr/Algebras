@@ -1,9 +1,9 @@
 #!/usr/bin/env sage
 
-##=============================  ainfdefs.sage  ==============================##
+##=========================  ainfdefs.sage  ==========================##
 """
-Work in progress; this script is a rewriting of the 'ainfdefs.mws' Maple14
-code in the sage/python programming language.
+Work in progress; this script is a rewriting of the 'ainfdefs.mws'
+Maple14 code in the sage/python programming language.
 
 All functions currently mirror the maple14 versions as much as possible.
 Function names have been copied verbatim with the exception of:
@@ -12,24 +12,27 @@ Function names have been copied verbatim with the exception of:
     sgn         Sgn
 
 NOTE:
-The work here is primarily a learning exercise in Maple and Sage.  The final
-intention is to fully convert this code to an object oriented system.
-Because M. Penkava is already familiar with the Maple named functions and
-operations, the intention is for the converted code to follow these
-conventions as much as possible possible.
+The work here is primarily a learning exercise in Maple and Sage.
+The final intention is to fully convert this code to an object
+oriented system.  Because M. Penkava is already familiar with the
+Maple named functions and operations, the intention is for the
+converted code to follow these conventions as much as possible possible.
 
 OBJECTS:
 A Base is represented by a list.
-A Tensor Monomial is represented by a list containing a base and a coefficient.
+A Tensor Monomial is represented by a list containing a base and
+    a coefficient.
 A Tensor is represented by a list of tensor monomials.
-A Coderivation Base is represented by a list containing a list and an index.
-A Coderivation Monomial is represented by a list containing a coderivation base
-    and a coefficient.
+A Coderivation Base is represented by a list containing a list
+    and an index.
+A Coderivation Monomial is represented by a list containing a
+    coderivation base and a coefficient.
 A Coderivation is represented by a list of coderivation monomials.
 """
 
-##==========================  GLOBAL VARIABLES  ==========================##
-# Subject to change for each space tested over (ie. ZEROCOEF is not always 0)
+##======================  GLOBAL VARIABLES  ======================##
+# Subject to change for each space tested over
+# (ie. ZEROCOEF is not always 0)
 PARITY = 0
 DIMENSION = 1
 ODD = 1
@@ -55,10 +58,10 @@ CMON_COEF = 1  # index of the coefficient in a coderivation monomial
 
 ZEROCODER = []
 
-##======================  getters and setters  =======================##
+##====================  getters and setters  =====================##
 # These functions are NOT part of the original Maple code.
-# To modify the value of global variables in this module, these functions
-# must be used.
+# To modify the value of global variables in this module, these
+# functions must be used.
 def get_DIMENSION():
     return DIMENSION
 
@@ -92,7 +95,7 @@ def set_PARITY(parity):
     return PARITY
 
 
-##==========================  basic Functions  ===========================##
+##======================  Basic Functions  =======================##
 # equality tester
 def deltaij(i,j):
     return (i == j) + 0
@@ -108,7 +111,7 @@ def Sgn(i):
     return (-1) ** (Integer(i) % 2)
 
 
-##=======================  Coefficient Functions  ========================##
+##===================  Coefficient Functions  ====================##
 # add
 def add_coef(a,b):
     return a+b
@@ -130,7 +133,7 @@ def parity_coef(c):
     return 0
 
 
-##==========================  Basis Functions  ===========================##
+##======================  Basis Functions  =======================##
 # multiply bases for a vector space
 def mult_tbas(base1,base2):
     return base1+base2
@@ -145,9 +148,9 @@ def parity_tbas(base):
     return mod(s,2)
 
 
-##=====================  Tensor Monomial Functions  ======================##
-# WTF are there two different functions for right and left multiplication?
-# A single function with cases would be cleaner.  (but perhaps slower?)
+##=================  Tensor Monomial Functions  ==================##
+# WTF are there two different functions for
+#   right and left multiplication?
 
 # degree of a tensor monomial
 def degree_tmon(tmon):
@@ -166,14 +169,15 @@ def mk_tmon(base, coef=ONECOEF):
 
 # parity of a tensor monomial
 def parity_tmon(tmon):
-    return parity_tbas(tmon[TMON_BASE]) + parity_coef(tmon[TMON_COEF]) % 2
+    return (parity_tbas(tmon[TMON_BASE]) +
+        parity_coef(tmon[TMON_COEF]) % 2)
 
 # multiply tensor monimial by a coefficient on the right
 def rmult_tmon_coef(tmon,coef):
     return mk_tmon(tmon[TMON_BASE],mult_coef(coef,tmon[TMON_COEF]))
 
 
-##==========================  Tensor Functions  ==========================##
+##======================  Tensor Functions  ======================##
 def add_tens(ten1, ten2):
     return ten1 + ten2
 
@@ -191,10 +195,12 @@ def comb_tens(tens_list):
                 if tens2[TMON_BASE] == tens[TMON_BASE]:
                     coef = add_coef(tens2[TMON_COEF], coef)
             if coef != ZEROCOEF:
-                tens_result = add_tens(tens_result, [[tens[TMON_BASE], coef]])
+                tens_result = add_tens(tens_result,
+                    [[tens[TMON_BASE], coef]])
     return tens_result
 
-# remove all monomials of degree less than or equal cutoff value from a tensor
+# remove all monomials of degree less than or equal cutoff
+# value from a tensor
 def cutoff_tens(tens,cutoff):
     tens_result = ZEROTENS
     if tens != ZEROTENS:
@@ -221,7 +227,8 @@ def mult_tens(tens1, tens2):
     for tmon1 in tens1:
         for tmon2 in tens2:
             tens_result = add_tens(tens_result,
-              mk_tens(mk_tmon(mult_tbas(tmon1[TMON_BASE], tmon2[TMON_BASE]),
+              mk_tens(mk_tmon(mult_tbas(tmon1[TMON_BASE],
+                tmon2[TMON_BASE]),
               mult_coef(tmon1[TMON_COEF], tmon2[TMON_COEF]))))
     return comb_tens(tens_result)
 
@@ -239,19 +246,20 @@ def rmult_tens_coef(tens,coef):
     return comb_tens(res)
 
 
-##=========================  Printing Functions  =========================##
+##=====================  Printing Functions  =====================##
 # print normal coefficient
 def pnt_coef(a):
     print(a)
     return a
 
-# pnt_tbase, pnt_tmon, and pnt_tens all simply display their given objects
-# using the symbol 'e' along with subscripts to represent basis elements.
-# They are not referenced anywhere else in ainfdefs.mws, so for now they have
-# been left out of the Sage code.
+# pnt_tbase, pnt_tmon, and pnt_tens all simply display their
+# given objects using the symbol 'e' along with subscripts to
+# represent basis elements.  They are not referenced anywhere
+# else in ainfdefs.mws, so for now they have been left out of
+# the Sage code.
 
 
-##====================  Coderivation Basis Functions  ====================##
+##================  Coderivation Basis Functions  ================##
 def mk_cbase(lst, index):
     cbase_result = [None] * 2
     cbase_result[CBASE_LIST] = lst
@@ -259,7 +267,8 @@ def mk_cbase(lst, index):
     return cbase_result
 
 def parity_cbase(cbas):
-    return (parity_elem(cbas[CBASE_INDEX]) + parity_tbas(cbas[CBASE_LIST])) % 2
+    return (parity_elem(cbas[CBASE_INDEX]) +
+        parity_tbas(cbas[CBASE_LIST])) % 2
 
 # apply a coderivation base to a tensor base
 def apply_cbase_tbas(cbas, tbas):
@@ -271,12 +280,12 @@ def apply_cbase_tbas(cbas, tbas):
     otbas = []
     for k in range(len(tbas)-len(J)+1):
         if k > 0:
-            coef = deltaij(J,tbas[k:k+len(J)]) * Sgn(parity_tbas(tbas[0:k-1]) *
-                parity_cbase(cbas))
+            coef = (deltaij(J,tbas[k:k+len(J)]) *
+                Sgn(parity_tbas(tbas[0:k-1]) * parity_cbase(cbas)))
             otbas = tbas[0:k-1]
         else:
-            coef = deltaij(J,tbas[k:k+len(J)]) * Sgn(parity_tbas(tbas) *
-                parity_cbase(cbas))
+            coef = (deltaij(J,tbas[k:k+len(J)]) *
+                Sgn(parity_tbas(tbas) * parity_cbase(cbas)))
             otbas = []
         otbas = otbas + [j] + tbas[k+len(J):len(tbas)-1]
         res = add_tens(res,mk_tens(mk_tmon(otbas,coef)))
@@ -295,12 +304,13 @@ def apply_cbase_tens(cbas, tens):
     return comb_tens(res)
 
 
-##==================  Coderivation Monomial Functions  ===================##
+##==============  Coderivation Monomial Functions  ===============##
 def mk_cmon(cbas, coef=ONECOEF):
     return [cbas, coef]
 
 def parity_cmon(cmon):
-    return (parity_cbase(cmon[CMON_BASE]) + parity_coef(cmon[CMON_COEF])) % 2
+    return (parity_cbase(cmon[CMON_BASE]) +
+        parity_coef(cmon[CMON_COEF])) % 2
 
 def apply_cmon_tens(cmon, tens):
     return apply_cbase_tens(cmon[CMON_BASE],
@@ -317,7 +327,7 @@ def mult_cmon_num(num, cmon):
     return lmult_cmon_coef(mult_coef_num(ONECOEF, num), cmon)
 
 
-##=======================  Coderivation Functions  =======================##
+##===================  Coderivation Functions  ===================##
 def mk_coder(cmon):
     return [cmon]
 
@@ -380,7 +390,7 @@ def apply_coder_tens(coder, tens):
     return comb_tens(tens_result)
 
 
-##=======================  Coderivation Brackets  ========================##
+##===================  Coderivation Brackets  ====================##
 # composition of two coderivation bases
 def comp_cbase(cbas1, cbas2):
     J = cbas1[CBASE_LIST]
@@ -437,7 +447,7 @@ def brack_coder(coder1, coder2):
     return comb_coder(result)
 
 
-##============================  Exponentials  ============================##
+##========================  Exponentials  ========================##
 # exponential of two coderivations
 def adm(mu, delta, m):
     if m==0:
