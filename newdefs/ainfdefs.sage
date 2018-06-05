@@ -400,7 +400,7 @@ def comp_cbase(cbas1, cbas2):
     coder_result = ZEROCODER
     for i in range(len(J)):
         coder_result = coder_result + [mk_cmon([J[:i]+K+J[i+1:],j],
-        mk_num_coef(deltaij(J[i],k) * Sgn(parity_tbas(J[i:]) *
+        mk_num_coef(deltaij(J[i],k) * Sgn(parity_tbas(J[:i]) *
         parity_cbase(cbas2))))]
     return comb_coder(coder_result)
 
@@ -467,5 +467,4 @@ def rTest(a, m):
         return a
     else:
         return a * rTest(a, m-1)
-
 
