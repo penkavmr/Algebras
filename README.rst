@@ -2,72 +2,86 @@
 Z2 Graded Complex Associative Algebras
 ======================================
 
-This SageMath project is an undertaking to classify the moduli space
+This SageMath_ project is an undertaking to classify the moduli space
 of low dimensional Z2 graded complex associative algebras.
 
 Previously, much of this work was done using various versions of
-Maple mathematics software.  This project is a rewriting of the
+Maple_ mathematics software.  This project is a rewriting of the
 original Maple code into the Sage/Python programming language.
-This currently consists of two phases:
-
-1.  Convert all Maple functions verbatim (same names, inputs, and
-    outputs). This will aid in understanding what exactly the code
-    is doing and ease the transition for experienced researchers.
-
-2. Object orient the SageMath code.  This will likely require a
-   good amount of code to be rewritten from scratch.
 
 
-Code
-====
 
-New SageMath code is located in the ``newdefs/`` folder.
+New Contributors
+================
+
+All new students, please read this before working on this project.
+
+To contribute to this project you will need a GitHub_ account.
+Github is the defacto way of sharing and collaborating on open
+source software projects.  Once you have a GitHub account, penkavmr
+must explicitly grant you user rights to this project.  Access to
+this project can be done either directly from a command line via
+git_ or through a the GitHub web browser interface.
+
+To execute this project's code you will need a running instance of
+SageMath.  SageMath is a free and open source computer algebra system;
+we recommend installing a copy of SageMath on your personal computer.
+SageMath is also freely available to run in a web browser at CoCalc_.
+
+In the name of readability and accessibility to future contributors,
+please have a look at the `python style guide`_.  In particular,
+try to limit line lengths to 72 characters, use 4 spaces as
+indentation, and comment your code as much as possible.
+
+
+
+Sage Code
+=========
 
 ``newdefs/ainfdefs.sage``
     SageMath code containing the verbatim rewriting of the
     original Maple functions.
 
 ``newdefs/test_ainfdefs.sage``
-    Script to check the output of the new SageMath functions with
-    the expected output of the original Maple functions.  This can
-    be executed directly from a shell prompt::
+    Script used to check the output of the new SageMath functions
+    against the expected output of the original Maple functions.
 
-        ./test_ainfdefs.sage
 
-    or from within a SageMath session::
 
-        execfile('test_ainfdefs.sage')
+Executing Sage Code
+===================
 
-The original Maple code is in the ``maple/`` folder.  Maple
-worksheets (``.mws``) are only viewable in Maple (from which they
-can be exported as text).
+There are multiple ways to execute and test this project's code.
 
-``maple/ainfdefs.mws``
-    Original Maple worksheet (circa 2001) containing all the
-    global variables and function definitions used to build and
-    deform Z2 graded algebras.
 
-``maple/ainfdefs.txt``
-    Text version of the original Maple worksheet.  Functions
-    have been properly formatted with indentation as we convert
-    them to SageMath.
+Sage CLI
+--------
 
-``maple/ainfdefs_new.mws``
-    A properly formatted version of ``ainfdefs.mws`` for
-    easier readability.
+The simplest method is done from within a Sage command line session.
+First navigate to the ``newdefs/`` directory.
+To load all the new function definitions, execute::
 
-``maple/ainfdefs_tests.mws``
-    Maple worksheet containing test cases of functions from
-    ``ainfdefs.mws``.  These test cases are compared with the
-    output of our new SageMath functions via the
-    ``test_ainfdefs.sage`` script.
+    execfile('ainfdefs.sage')
+
+To run the test script, execute::
+
+    execfile('test_ainfdefs.sage')
+
+
+CoCalc
+------
+
+From within the CoCalc web interface, there are two possible ways to
+execute the code.  Firstly, a Sage CLI session can be run within a
+terminal on the CoCalc server; the method described above may be
+used to execute the code in this manner.  Secondly, you may cut
+and paste the code directly into a CoCalc worksheet and execute it
+in the worksheet.
+
 
 
 SageMath on the BGSC Cluster
 ============================
-
-Sage notebook
--------------
 
 It is currently possible to run a sage notebook server on the
 BGSC and access it from a local machine with the following steps.
@@ -92,16 +106,10 @@ BGSC and access it from a local machine with the following steps.
     ``http://localhost:8080``
 
 
-CoCalc
-------
-
-Eventually it would be nice to permanently host a full fledged
-CoCalc server on the BGSC.  This is entirely possible using a
-`CoCalc Docker image`_.  Unfortunately, the installation and
-setup of this image needs to be done by a BGSC admin and is not
-on their list of priorities.
-
-
-
-
+.. _GitHub: https://github.com/
+.. _python style guide: https://www.python.org/dev/peps/pep-0008/
+.. _git: https://git-scm.com/
+.. _Maple: https://www.maplesoft.com/products/Maple/
+.. _SageMath: http://www.sagemath.org/
+.. _CoCalc: https://cocalc.com/
 .. _CoCalc Docker image: https://github.com/sagemathinc/cocalc/blob/master/src/dev/docker/README.md

@@ -545,65 +545,68 @@ ul.auto-toc {
 <div class="document" id="z2-graded-complex-associative-algebras">
 <h1 class="title">Z2 Graded Complex Associative Algebras</h1>
 
-<p>This SageMath project is an undertaking to classify the moduli space
+<p>This <a class="reference external" href="http://www.sagemath.org/">SageMath</a> project is an undertaking to classify the moduli space
 of low dimensional Z2 graded complex associative algebras.</p>
 <p>Previously, much of this work was done using various versions of
-Maple mathematics software.  This project is a rewriting of the
-original Maple code into the Sage/Python programming language.
-This currently consists of two phases:</p>
-<ol class="arabic simple">
-<li>Convert all Maple functions verbatim (same names, inputs, and
-outputs). This will aid in understanding what exactly the code
-is doing and ease the transition for experienced researchers.</li>
-<li>Object orient the SageMath code.  This will likely require a
-good amount of code to be rewritten from scratch.</li>
-</ol>
-<div class="section" id="code">
-<h1>Code</h1>
-<p>New SageMath code is located in the <tt class="docutils literal">newdefs/</tt> folder.</p>
+<a class="reference external" href="https://www.maplesoft.com/products/Maple/">Maple</a> mathematics software.  This project is a rewriting of the
+original Maple code into the Sage/Python programming language.</p>
+<div class="section" id="new-contributors">
+<h1>New Contributors</h1>
+<p>All new students, please read this before working on this project.</p>
+<p>To contribute to this project you will need a <a class="reference external" href="https://github.com/">GitHub</a> account.
+Github is the defacto way of sharing and collaborating on open
+source software projects.  Once you have a GitHub account, penkavmr
+must explicitly grant you user rights to this project.  Access to
+this project can be done either directly from a command line via
+<a class="reference external" href="https://git-scm.com/">git</a> or through a the GitHub web browser interface.</p>
+<p>To execute this project's code you will need a running instance of
+SageMath.  SageMath is a free and open source computer algebra system;
+we recommend installing a copy of SageMath on your personal computer.
+SageMath is also freely available to run in a web browser at <a class="reference external" href="https://cocalc.com/">CoCalc</a>.</p>
+<p>In the name of readability and accessibility to future contributors,
+please have a look at the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">python style guide</a>.  In particular,
+try to limit line lengths to 72 characters, use 4 spaces as
+indentation, and comment your code as much as possible.</p>
+</div>
+<div class="section" id="sage-code">
+<h1>Sage Code</h1>
 <dl class="docutils">
 <dt><tt class="docutils literal">newdefs/ainfdefs.sage</tt></dt>
 <dd>SageMath code containing the verbatim rewriting of the
 original Maple functions.</dd>
 <dt><tt class="docutils literal">newdefs/test_ainfdefs.sage</tt></dt>
-<dd><p class="first">Script to check the output of the new SageMath functions with
-the expected output of the original Maple functions.  This can
-be executed directly from a shell prompt:</p>
+<dd>Script used to check the output of the new SageMath functions
+against the expected output of the original Maple functions.</dd>
+</dl>
+</div>
+<div class="section" id="executing-sage-code">
+<h1>Executing Sage Code</h1>
+<p>There are multiple ways to execute and test this project's code.</p>
+<div class="section" id="sage-cli">
+<h2>Sage CLI</h2>
+<p>The simplest method is done from within a Sage command line session.
+First navigate to the <tt class="docutils literal">newdefs/</tt> directory.
+To load all the new function definitions, execute:</p>
 <pre class="literal-block">
-./test_ainfdefs.sage
+execfile('ainfdefs.sage')
 </pre>
-<p>or from within a SageMath session:</p>
-<pre class="last literal-block">
+<p>To run the test script, execute:</p>
+<pre class="literal-block">
 execfile('test_ainfdefs.sage')
 </pre>
-</dd>
-</dl>
-<p>The original Maple code is in the <tt class="docutils literal">maple/</tt> folder.  Maple
-worksheets (<tt class="docutils literal">.mws</tt>) are only viewable in Maple (from which they
-can be exported as text).</p>
-<dl class="docutils">
-<dt><tt class="docutils literal">maple/ainfdefs.mws</tt></dt>
-<dd>Original Maple worksheet (circa 2001) containing all the
-global variables and function definitions used to build and
-deform Z2 graded algebras.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs.txt</tt></dt>
-<dd>Text version of the original Maple worksheet.  Functions
-have been properly formatted with indentation as we convert
-them to SageMath.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs_new.mws</tt></dt>
-<dd>A properly formatted version of <tt class="docutils literal">ainfdefs.mws</tt> for
-easier readability.</dd>
-<dt><tt class="docutils literal">maple/ainfdefs_tests.mws</tt></dt>
-<dd>Maple worksheet containing test cases of functions from
-<tt class="docutils literal">ainfdefs.mws</tt>.  These test cases are compared with the
-output of our new SageMath functions via the
-<tt class="docutils literal">test_ainfdefs.sage</tt> script.</dd>
-</dl>
+</div>
+<div class="section" id="cocalc">
+<h2>CoCalc</h2>
+<p>From within the CoCalc web interface, there are two possible ways to
+execute the code.  Firstly, a Sage CLI session can be run within a
+terminal on the CoCalc server; the method described above may be
+used to execute the code in this manner.  Secondly, you may cut
+and paste the code directly into a CoCalc worksheet and execute it
+in the worksheet.</p>
+</div>
 </div>
 <div class="section" id="sagemath-on-the-bgsc-cluster">
 <h1>SageMath on the BGSC Cluster</h1>
-<div class="section" id="sage-notebook">
-<h2>Sage notebook</h2>
 <p>It is currently possible to run a sage notebook server on the
 BGSC and access it from a local machine with the following steps.</p>
 <ol class="arabic">
@@ -631,15 +634,6 @@ notebook(accounts=true)
 <tt class="docutils literal"><span class="pre">http://localhost:8080</span></tt></p>
 </li>
 </ol>
-</div>
-<div class="section" id="cocalc">
-<h2>CoCalc</h2>
-<p>Eventually it would be nice to permanently host a full fledged
-CoCalc server on the BGSC.  This is entirely possible using a
-<a class="reference external" href="https://github.com/sagemathinc/cocalc/blob/master/src/dev/docker/README.md">CoCalc Docker image</a>.  Unfortunately, the installation and
-setup of this image needs to be done by a BGSC admin and is not
-on their list of priorities.</p>
-</div>
 </div>
 </div>
 </body>
